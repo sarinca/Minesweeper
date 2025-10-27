@@ -1,73 +1,58 @@
-
+/* ========== Horizontal Nav Bar ========== */
 body {
     background-color: rgba(252, 245, 217);
+    color: #000;
+    font-family: system-ui, sans-serif;
 }
 
-/* Top navigation bar styles */
-.top_nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-height: 50px;
-
-    color: #000000;
-
-    font-size: 8px;
-    /*padding: 4px 4px;*/
-    padding-left: 20px;
-    border-top: none;
-    border-right: none;
-    border-left: none;
+.navbar {
+    background-color: rgba(252, 245, 217);
     border-bottom: 8px solid rgb(243, 236, 210);
-
 }
+
+.navbar-parent {
+    font-family: system-ui, sans-serif;
+    font-style: normal;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.profile-dropdown {
+    background-color: rgba(252, 245, 217);
+    width: 100px;
+}
+
+#profile-select:hover {
+    cursor: pointer;
+}
+
+/* ========== Profile Section ========== */
 #pfp {
     height: 32px;
     width: 32px;
-    border-radius: 50%;
     background-color: transparent;
-    margin-right: 10px;
     align-self: center;
     vertical-align: middle;
 }
-#profile-select {
-    min-width: 100px;
-    padding: 8px;
-    margin-top: 10px;
-    background-color: transparent;
-    border: none;
-}
-.select {
-    appearance: transparent;
-    background-color: transparent;
-    border: none;
-    display: inline-block;
-    padding-right: 20px;
-    padding-bottom: 15px;
-}
-select::-ms-expand {
-    display: none;
-}
-.select::after {
-  content: "";
-  width: 0.8em;
-  height: 0.5em;
-  background-color: var(--select-arrow);
-  clip-path: polygon(100% 0%, 0 0%, 50% 100%);
-}
 
-
-/* Sidebar styles */
-.side_bar {
+/* ========== Sidebar Styles ========== */
+.vertical-nav {
+    background-color: rgba(252, 245, 217);
     width: 200px;
     display: flex;
     flex-direction: column;
     border-right: 8px solid rgb(243, 236, 210);
     height: 100vh;
     box-sizing: border-box;
+    background-color: rgba(252, 245, 217);
+    padding-top: 10px;
 }
 
-.nav_link {
+
+.nav-link {
+    background-color: rgba(252, 245, 217);
     display: flex;
     align-items: center;
     padding: 0 25px;
@@ -76,6 +61,10 @@ select::-ms-expand {
     color: black;
 }
 
-.nav_link:hover {
+.vertical-nav .nav-link:hover {
     background-color: #fbe9af;
 }
+
+.vertical-nav .nav-link.active {
+    background-color: #fbe9af;
+} 
