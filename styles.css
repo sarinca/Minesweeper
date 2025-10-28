@@ -91,8 +91,10 @@ body {
     color: white;
     cursor: pointer;
     border-radius: 50%;
-    font-size: 0.95em;
-    padding: 8px;
+    width: 16px;
+    height: 16px;
+
+    padding: 35px;
     box-sizing: border-box;
     transition: 150ms ease-out;
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.25);
@@ -103,13 +105,9 @@ body {
     transition: 150ms ease-in;
 }
 
-.edit-icon {
+.edit-icon .delete-icon {
     width: 100%;
-    background-color: blue;
-}
-
-.delete-icon {
-    background-color: #bf2611;
+    border-radius: 50%;
 }
 
 #content_list_container {
