@@ -57,7 +57,7 @@
 function getTopPointUsers(){
     global $db;
 
-    $query = "SELECT username, totalScore FROM profile";
+    $query = "SELECT username, totalScore FROM profile ORDER BY totalScore DESC";
     $statement = $db->prepare($query);
     $statement->execute();
     $results = $statement->fetchAll();

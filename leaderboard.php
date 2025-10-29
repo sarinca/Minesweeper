@@ -1,10 +1,8 @@
 <?php 
-//require('connect-db.php');         // include() 
-//require('request-db.php');
+require('connect-db.php');         // include() 
+require('request-db.php');
 
-//$all_user_points = getTopPointUsers();   //get all rows in the table
-$all_user_points = null;
-
+$all_user_points = getTopPointUsers();   //get all rows in the table
 ?>
 
 
@@ -92,6 +90,14 @@ $all_user_points = null;
                     <th width="40%"><b>Total Points</b></th>        
                 </tr>
                 </thead>
+
+                <?php foreach ($all_user_points as  $board_entry): ?>
+
+                    <tr>
+                    <td><?php echo $board_entry['username']; ?></td>
+                    <td><?php echo $board_entry['totalScore']; ?></td>
+                    </tr>
+                <?php endforeach; ?>
             </table>
             </div>  
 
