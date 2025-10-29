@@ -68,3 +68,11 @@ body {
 .vertical-nav .nav-link.active {
     background-color: #fbe9af;
 } 
+
+/* ========== Leaderboard Styles ========== */
+
+.input-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
