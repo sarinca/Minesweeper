@@ -65,4 +65,20 @@ function getTopPointUsers(){
     return $results;
 }
 
+function getUserStats($user_id){
+    global $db;
+
+    $query = "SELECT username, totalScore 
+            FROM profile
+            WHERE userId=:userId";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userId', $user_id);
+
+    $statement->execute();
+    $results = $statement->fetch();
+    $statement->closeCursor();
+    return $results;
+}
+
 ?>
