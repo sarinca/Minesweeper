@@ -44,7 +44,6 @@ body {
     display: flex;
     flex-direction: column;
     border-right: 8px solid rgb(243, 236, 210);
-    height: 100vh;
     box-sizing: border-box;
     background-color: rgba(252, 245, 217);
     padding-top: 10px;
@@ -67,7 +66,63 @@ body {
 
 .vertical-nav .nav-link.active {
     background-color: #fbe9af;
-} 
+}
+
+/* ngl i have no clue why the below doesnt work when it should... */
+/* =========== link coloring  =========== */
+a {
+    color: #fbe9af;
+}
+
+a:hover {
+    color: #fbe9af;
+}
+
+/* button styling */
+.btn {
+    border-bottom: solid 4px #fbe9af;
+    border-right: solid 4px #fbe9af;
+    background-color: #fbe9af;
+}
+
+.btn:hover {
+    background-color: #fbe9af;
+}
+
+/* =========== checkbox coloring  =========== */
+.form-group label.form-label {
+    color: #fbe9af;
+}
+
+.form-group input.form-control:focus {
+    border-color: #fbe9af;
+    box-shadow: 0 0 10px #fbe9af;
+}
+
+.form-control:focus {
+    border-color: #fbe9af;
+    box-shadow: 0 0 10px #fbe9af;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 0 10px #fbe9af;
+    border: #fbe9af;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #fbe9af;
+    box-shadow: 0 0 10px #fbe9af;
+    border: #fbe9af;
+}
+
+input[type="checkbox"]:enabled {
+    box-shadow: 0 0 10px #fbe9af;
+    border: #fbe9af;
+}
 
 /* ========== Leaderboard Styles ========== */
 
