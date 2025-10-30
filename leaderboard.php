@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
                         <option value="monthly">This Month</option>
                         <option value="allTime">All Time</option>
                     </select>
-                    <input class="btn btn-outline-dark m-2" type="submit" Value="refresh!" name="refreshBtn">
+                    <input class="btn m-2" type="submit" Value="refresh!" name="refreshBtn">
                     </input>
                 </div>
             </form>
@@ -136,37 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
         </div>
     </div>
-
-<div class="container">
-  <div class="row g-3 mt-2">
-    <div class="col">
-      <h2>Leaderboard</h2>
-    </div>  
-  </div>
-</div>
-
-
-<hr/>
-<div class="container">
-<div class="row justify-content-center">  
-<table class="w3-table w3-bordered w3-card-4 center" style="width:100%">
-  <thead>
-  <tr style="background-color:#B0B0B0">
-    <th width="40%"><b>Username</b></th>
-    <th width="40%"><b>Total Points</b></th>        
-  </tr>
-  </thead>
-
-  <?php foreach ($all_user_points as  $board_entry): ?>
-
-    <tr>
-      <td><?php echo $board_entry['username']; ?></td>
-      <td><?php echo $board_entry['totalScore']; ?></td>
-    </tr>
-  <?php endforeach; ?>
-
-</table>
-</div>   
 
 
 <br/><br/>
