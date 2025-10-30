@@ -81,4 +81,50 @@ function getUserStats($user_id){
     return $results;
 }
 
+
+function getGamesPlayed($user_id) {
+    global $db;
+
+    $query = "SELECT COUNT(*) AS games_played, 
+                MIN(gameTime) AS fastest_time 
+            FROM game
+            WHERE userId=:userId";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userId', $user_id);
+
+    $statement->execute();
+    $results = $statement->fetch();
+    $statement->closeCursor();
+    return $results;
+
+}
+
+
+function getUserFriends($user_id) {
+    global $db;
+
+    $query = "SELECT p.username AS friend_username
+                FROM friends f
+                JOIN profile p ON p.userId = f.userIdTwo
+                WHERE f.userIdOne = :userId
+
+                UNION
+
+                SELECT p.username AS friend_username
+                FROM friends f
+                JOIN profile p ON p.userId = f.userIdOne
+                WHERE f.userIdTwo = :userId
+    ";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userId', $user_id);
+    $statement->execute();
+
+    $results = $statement->fetchAll();
+    $statement->closeCursor();
+
+    return $results; 
+}
+
 ?>

@@ -7,6 +7,8 @@ require('request-db.php');
 
 $user_id = 1; // NOTE: I'LL GET THIS FROM NATALIA LATER? WHATEVER ID THE USER LOGS IN WITH
 $user_stats = getUserStats($user_id);
+$games_played = getGamesPlayed($user_id);
+$friends_list = getUserFriends($user_id);
 ?>
 
 <!DOCTYPE html>
@@ -42,7 +44,14 @@ $user_stats = getUserStats($user_id);
             <!-- will change this to be high score instead, messed up my SQL but want to make sure we still pulling -->
             <span id=highestScore>Total Score: <?php if($user_stats != null) echo ($user_stats['totalScore']); ?></span>
         </div>
-        <div class=statsBottomRow><span id=gamesPlayed> </span><span id=fastestTime>Fastest Time:</span></div>
+        <div class=statsBottomRow>
+            <span id=gamesPlayed>Games Played: 
+                <?php echo intval($games_played['games_played'] ?? 0); ?>
+        </span>
+        <span id=fastestTime>Fastest Time:
+            <?php echo intval($games_played['fastest_time'] ?? 0); ?>
+        </span>
+    </div>
     
     </div>
 
@@ -55,12 +64,12 @@ $user_stats = getUserStats($user_id);
                     <div class="accordion-button collapsed d-flex" data-bs-toggle="collapse" data-bs-target="#item_1"
                         aria-expanded="false" aria-controls="#item_1">
                         <h5 class="content_title fw-bold">Game History</h5>
-                        <div class="ms-auto">
+                        <!-- <div class="ms-auto">
                             <span class="edit-icon" data-app-id="1" data-content-id="1"
                                 aria-hidden="true"><button type ="button" class ="btn btn-success"> ✓ </button></span>
                             <span class="delete-icon" data-app-id="1" data-content-id="1"
                                 aria-hidden="true"><button type ="button" class ="btn btn-danger"> X </button></span>
-                        </div>
+                        </div> -->
                     </div>
                 </h2>
                 <div id="item_1" class="accordion-collapse collapse" aria-labelledby="flush-heading-1"
@@ -72,6 +81,18 @@ $user_stats = getUserStats($user_id);
             </div>
         </div>
     </div>
+
+    <!-- Friends List -->
+    <?php if (!empty($friends_list)): ?>
+        <ul>
+            <?php foreach ($friends_list as $friend): ?>
+                <li><?= htmlspecialchars($friend['friend_username']) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p>No friends found.</p>
+    <?php endif; ?>
+
 
     <script>
         const editBtns = document.querySelectorAll(".edit-icon");
