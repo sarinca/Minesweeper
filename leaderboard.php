@@ -3,6 +3,35 @@ require('connect-db.php');         // include()
 require('request-db.php');
 
 $all_user_points = getTopPointUsers();   //get all rows in the table
+$selected_mode = "allPoints";
+$selected_users = "allUsers";
+$selected_time = "weekly";
+
+?>
+
+
+<?php 
+if ($_SERVER['REQUEST_METHOD'] == 'POST')  
+{
+   if (!empty($_POST['refreshBtn']))
+   {
+    //idea here: filter the entries accordingly
+    echo $_POST['modeSelect'];
+    echo $_POST['friendSelect'];
+    echo $_POST['timeSelect'];
+
+    $selected_mode = $_POST['modeSelect'];
+    $selected_users = $_POST['friendSelect'];
+    $selected_time = $_POST['timeSelect'];
+
+
+    //   addRequests($_POST['requestedDate'], $_POST['roomNo'], $_POST['requestedBy'], 
+    //               $_POST['requestDesc'], $_POST['priority_option']);
+
+    //   //read the table values again (refresh)
+    //   $list_of_requests = getAllRequests();
+   } 
+}
 ?>
 
 
@@ -62,25 +91,29 @@ $all_user_points = getTopPointUsers();   //get all rows in the table
         </ul>
         <div class="m-5" style="width:68%;"> 
             <h2 class="mb-5"> Leaderboard </h2>
-
-            <div style="display: flex; flex-direction: row;">
-                <select id="modeSelect" class="form-select m-2">
-                    <option value="allPoints" selected>Total Rank Points</option>
-                    <option value="easy">Easy Mode Only</option>
-                    <option value="med">Medium Mode Only</option>
-                    <option value="hard">Hard Mode Only</option>
-                </select>
-                <select id="friendSelect" class="form-select m-2">
-                    <option value="allUsers" selected>All Users</option>
-                    <option value="friends">My Friends</option>
-                </select>
-                <select id="timeSelect" class="form-select m-2">
-                    <option value="weekly" selected>This Week</option>
-                    <option value="today">Today</option>
-                    <option value="monthly">This Month</option>
-                    <option value="allTime">All Time</option>
-                </select>
-            </div>
+            <form method="post" action="<?php $_SERVER['PHP_SELF'] ?>">
+                <div style="display: flex; flex-direction: row;">
+                    <select id="modeSelect" name="modeSelect" class="form-select m-2">
+                        <option value="allPoints" selected>Total Rank Points</option>
+                        <option value="easy">Easy Mode Only</option>
+                        <option value="med">Medium Mode Only</option>
+                        <option value="hard">Hard Mode Only</option>
+                    </select>
+                    <select id="friendSelect" name="friendSelect" class="form-select m-2">
+                        <option value="allUsers" selected>All Users</option>
+                        <option value="friends">My Friends</option>
+                    </select>
+                    <select id="timeSelect" name="timeSelect" class="form-select m-2">
+                        <option value="weekly" selected>This Week</option>
+                        <option value="today">Today</option>
+                        <option value="monthly">This Month</option>
+                        <option value="allTime">All Time</option>
+                    </select>
+                    <input class="btn btn-outline-dark m-2" type="submit" Value="refresh!" name="refreshBtn">
+                    </input>
+                </div>
+            </form>
+            
 
             <div class="row justify-content-center">  
             <table class="w3-table w3-bordered w3-card-4 center" style="width:90%%">
