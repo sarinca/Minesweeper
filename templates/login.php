@@ -93,11 +93,11 @@
                                 <div class="modal-body form-group">
                                     <div id="jsMessage" class="mb-2 text-center"></div>
                                     <label for="resetEmail" class="form-label">Enter your email address:</label>
-                                    <input type="email" id="resetEmail" class="form-control" placeholder="example@email.com">
+                                    <input type="email" id="resetEmail" class="form-control rounded-pill" placeholder="example@email.com">
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn" data-bs-dismiss="modal">Cancel</button>
-                                    <button id="sendResetBtn" type="button" class="btn">Send Reset Link</button>
+                                    <button type="button" class="btn loginbtn rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                                    <button id="sendResetBtn" type="button" class="btn loginbtn rounded-pill">Send Reset Link</button>
                                 </div>
                             </div>
                         </div>
@@ -122,7 +122,7 @@
                                         placeholder="Password" required value="<?php 
                                         if (isset($_COOKIE['password'])) { 
                                             echo $_COOKIE['password']; 
-                                        } 
+                                        }
                                     ?>">
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mb-3 form-group">
@@ -133,14 +133,14 @@
                                                     echo "checked"; 
                                                 } 
                                             ?>">
-                                        <label class="form-check-label" style="color: #ffc400ff;" for="rememberMe">Remember Me</label>
+                                        <label class="form-check-label" for="rememberMe">Remember Me</label>
                                     </div>
-                                    <a href="#" class="text-decoration-none" style="color: #ffc400ff;">Forgot Password?</a>
+                                    <a href="#" class="text-decoration-none">Forgot Password?</a>
                                 </div>
-                                <button type="submit" style="background-color: #fbe9af; border-color: #fbe9af;" class="btn rounded-pill w-100">Login</button>
+                                <button type="submit" style="background-color: #fbe9af; border-color: #fbe9af;" class="btn loginbtn rounded-pill w-100">Login</button>
                             </form>
                             <div class="text-center mt-3">
-                                <p>Don't have an account? <a href="?command=register" class="text-decoration-none" style="color: #ffc400ff;">Register here</a></p>
+                                <p>Don't have an account? <a href="?command=register" class="text-decoration-none">Register here</a></p>
                             </div>
                         </div>
                     </div>
