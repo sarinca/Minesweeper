@@ -68,30 +68,51 @@ body {
     background-color: #fbe9af;
 }
 
-/* ngl i have no clue why the below doesnt work when it should... */
 /* =========== link coloring  =========== */
 a {
-    color: #fbe9af;
+    color: #ffca1dff;
 }
 
 a:hover {
-    color: #fbe9af;
+    color: rgb(255, 187, 0);
 }
 
-/* button styling */
-.btn {
-    border-bottom: solid 4px #fbe9af;
-    border-right: solid 4px #fbe9af;
+/* =========== small media screen navbar link coloring  =========== */
+.nav-link:hover {
+    color: rgb(255, 187, 0);
+}
+
+.nav-link:hover {
     background-color: #fbe9af;
 }
 
-.btn:hover {
+.navbar-toggler {
+    color: #fbe9af00;
+    border: #fbe9af;
+}
+
+/* =========== button styling =========== */
+.loginbtn {
+    background-color: #fbe9af;
+    color: #000;
+}
+
+.loginbtn:hover {
     background-color: #fbe9af;
 }
 
-/* =========== checkbox coloring  =========== */
+/* =========== form group coloring  =========== */
+.form-group .form-control {
+    background-color: #fbe9af; 
+    border-color: #fbe9af;
+}
+
 .form-group label.form-label {
-    color: #fbe9af;
+    color: #000;
+}
+
+.form-group label.form-check-label {
+    color: #ffca1dff;
 }
 
 .form-group input.form-control:focus {
@@ -104,6 +125,7 @@ a:hover {
     box-shadow: 0 0 10px #fbe9af;
 }
 
+/* =========== checkbox coloring  =========== */
 input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
