@@ -25,68 +25,92 @@
     </head>
 
     <body data-new-gr-c-s-check-loaded="14.1093.0" data-gr-ext-installed="">
-        <nav class="navbar navbar-expand-md">
+        <nav class="navbar navbar-expand-md px-3 d-none d-md-block">
             <div class="container-fluid">
-                <a class="navbar-brand" href="?command=home">Minesweeper</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="?command=home">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="?command=register">Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="?command=login">Log In</a>
-                        </li>
-                    </ul>
-                </div>
+                <a class="navbar-brand navbar-parent" href="?command=home">Minesweeper</a>
             </div>
         </nav>
+    
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-md-3 d-none d-md-block"> 
+                    <nav class="nav flex-column">
+                        <ul class="vertical-nav">
+                            <a class="nav-link" href="?command=home">Home</a>
+                            <a class="nav-link" href="?command=login">Login</a>
+                            <a class="nav-link" href="?command=play">Play</a>
+                            <a class="nav-link" href="?command=leaderboard">Leaderboard</a>
+                        </ul>
+                    </nav>
+                </div>
 
-        <div class="container">
-            <div class="text-center">
-                <h1 class="display-4 pt-3">Minesweeper</h1>
-                <hr>
-            </div>
-
-            <div class="text-center" id="jsMessage">
-                <?=$message?>
-            </div>
-        </div>
-
-        <div class="container d-flex justify-content-center align-items-center mt-3">
-            <div class="card p-4 shadow" style="width: 600px;">
-                <h2 class="text-center mb-4">Register</h2>
-                <form action="?command=register" method="post">
-                    <div class="form-group mb-4">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" id="username" class="form-control" name="username" placeholder="Enter username" required>
-                        <div id="usernameHelpBlock" class="form-text d-none">
-                            Your username must only contain letters, numbers, and underscores.
+                <!-- visible only on small screen -->
+                <nav class="navbar navbar-expand-md px-3 d-md-none shadow-sm">
+                    <div class="container-fluid">
+                        <a class="navbar-brand fw-bold">Minesweeper</a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="?command=home">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="?command=login">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="?command=play">Play</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="?command=leaderboard">Leaderboard</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
+                </nav>
 
-                    <div class="form-group mb-4">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="text" id="email" class="form-control" name="email" placeholder="name@example.com" required>
+                <div class="col-12 col-md-8">
+                    <div class="container">
+                        <h1 class="display-4 pt-5">Register</h1>
+                        <hr>
+
+                        <!-- this shows error messages but needs PHP configuration -->
+                        <!-- <div class="text-center">
+                            //<?=$message?>
+                        </div> -->
                     </div>
+                    <div class="container d-flex justify-content-center align-items-center mt-4">
+                        <div class="card bg-transparent border-0 p-4" style="width: 900px; height: 375px;">
+                            <form action="?command=register" method="post">
+                                <div class="form-group mb-4">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" id="username" class="form-control rounded-pill" name="username" placeholder="Enter username" required>
+                                    <div id="usernameHelpBlock" class="form-text d-none">
+                                        Your username must only contain letters, numbers, and underscores.
+                                    </div>
+                                </div>
 
-                    <div class="form-group mb-4">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" id="password" class="form-control" name="password" placeholder="Enter password" required>
-                        <div id="passwordHelpBlock" class="form-text d-none">
-                            Your password must contain ...
+                                <div class="form-group mb-4">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="text" id="email" class="form-control rounded-pill" name="email" placeholder="name@example.com" required>
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" id="password" class="form-control rounded-pill" name="password" placeholder="Enter password" required>
+                                    <div id="passwordHelpBlock" class="form-text d-none">
+                                        Your password must contain ...
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn rounded-pill loginbtn w-100" style="background-color: #fbe9af; border-color: #fbe9af;">Register</button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <p>Already have an account? <a href="?command=login" class="text-decoration-none">Log in here</a></p>
+                            </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn w-100">Register</button>
-                </form>
-                <div class="text-center mt-3">
-                    <p>Already have an account? <a href="?command=login" class="text-decoration-none">Log in here</a></p>
                 </div>
             </div>
         </div>

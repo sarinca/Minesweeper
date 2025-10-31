@@ -7,6 +7,8 @@
 $username = 'adb2xp'; // adb2xp
 $password = 'Fall2025'; //Fall2025
 $host = 'mysql01.cs.virginia.edu';
+//$host='localhost';
+//$host = '127.0.0.1';
 $dbname = 'adb2xp';
 $dsn = "mysql:host=$host;dbname=$dbname";
 ////////////////////////////////////////////
@@ -59,7 +61,7 @@ catch (PDOException $e)     // handle a PDO exception (errors thrown by the PDO 
 catch (Exception $e)       // handle any type of exception
 {
    $error_message = $e->getMessage();
-   echo "<p>Error message: $error_message </p>";
+   // echo "<p>Error message: $error_message </p>";
 }
 
 ?>
