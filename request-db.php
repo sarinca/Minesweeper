@@ -100,6 +100,22 @@ function getGamesPlayed($user_id) {
 
 }
 
+function getGameHistory($user_id) {
+    global $db;
+
+    $query = "SELECT *
+            FROM game
+            WHERE userId=:userId";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userId', $user_id);
+
+    $statement->execute();
+    $results = $statement->fetchAll();
+    $statement->closeCursor();
+    return $results;
+}
+
 
 function getUserFriends($user_id) {
     global $db;

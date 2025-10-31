@@ -104,3 +104,15 @@ body {
 #content_list_container {
     padding: 2rem;
 }
+
+.accordion-item {
+    margin-bottom: 100px;
+}
+
+.game-items {
+    list-style-type: none;
+}
+
+.game-history-items {
+    display: flex;
+}
