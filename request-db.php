@@ -65,29 +65,29 @@ function getTopPointUsers(){
     return $results;
 }
 
-function processFiltering($gameMode, $userFriends, $timeRange){
-    global $db;
+// function processFiltering($gameMode, $userFriends, $timeRange){
+//     global $db;
 
-    $display_entries = null;
+//     $display_entries = null;
 
-    //step 1: filter based on game mode OR all-time
-    if ($gameMode == 'easy' || $gameMode == 'med' || $gameMode == 'hard'){
-        //filter by game mode from a diff table
-        //TODO: write this function
-    } else {
-        $display_entries = getTopPointUsers();
-    }
+//     //step 1: filter based on game mode OR all-time
+//     if ($gameMode == 'easy' || $gameMode == 'med' || $gameMode == 'hard'){
+//         //filter by game mode from a diff table
+//         //TODO: write this function
+//     } else {
+//         $display_entries = getTopPointUsers();
+//     }
 
-    //step 2: with display_entries as a param, filter based on user friends
-    if ($userFriends == 'friends'){
-        //filter by friends only with the current user
-        //TODO: write this function
-    }
+//     //step 2: with display_entries as a param, filter based on user friends
+//     if ($userFriends == 'friends'){
+//         //filter by friends only with the current user
+//         //TODO: write this function
+//     }
 
-    //step 3: with display_entries as a param, filter based on time range IF a game mode is selected (not all-time)
-    if ($gameMode != 'allPoints'){
-        //TODO: filter game entries by completion date
-    }
-}
+//     //step 3: with display_entries as a param, filter based on time range IF a game mode is selected (not all-time)
+//     if ($gameMode != 'allPoints'){
+//         //TODO: filter game entries by completion date
+//     }
+// }
 
 ?>

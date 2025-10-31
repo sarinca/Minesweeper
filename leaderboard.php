@@ -3,9 +3,25 @@ require('connect-db.php');         // include()
 require('request-db.php');
 
 $all_user_points = getTopPointUsers();   //get all rows in the table
+
+//bandaid while server doesn't respond
+// $all_user_points = [];
+
+// for ($i = 1; $i <= 20; $i++) {
+//     $all_user_points[] = [
+//         'username' => 'user' . $i,
+//         'totalScore' => rand(0, 1000) // Generates a random totalPoints between 0 and 1000
+//     ];
+// }
+
+// var_dump($all_user_points);
+
 $selected_mode = "allPoints";
 $selected_users = "allUsers";
 $selected_time = "weekly";
+
+//controls rendering of the table
+$dark_row = false;
 
 ?>
 
@@ -16,9 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
    if (!empty($_POST['refreshBtn']))
    {
     //idea here: filter the entries accordingly
-    echo $_POST['modeSelect'];
-    echo $_POST['friendSelect'];
-    echo $_POST['timeSelect'];
+    echo "Mode selected: " . $_POST['modeSelect'];
+    echo "Friend users selected: " . $_POST['friendSelect'];
+    echo "Time range selected: " . $_POST['timeSelect'];
 
     $selected_mode = $_POST['modeSelect'];
     $selected_users = $_POST['friendSelect'];
@@ -53,6 +69,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
+
+    <style>
+        tr.table-warning {
+            --bs-table-bg: #FFE9B1 !important; /* Light Yellow */
+            border-color: #FFE9B1 !important;
+        }
+
+        tr.table-danger {
+            --bs-table-bg: #FFD788 !important; /* Dark Yellow */
+            border-color: #FFD788 !important;
+        }
+    </style>
 
 <body> 
 
@@ -116,17 +144,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
             
 
             <div class="row justify-content-center">  
-            <table class="w3-table w3-bordered w3-card-4 center" style="width:90%%">
-                <thead>
+            <table class="table" style="width:90%">
+                <thead style="--bs-table-bg:rgba(249, 215, 143); border-color:rgba(249, 215, 143)">
                 <tr>
                     <th width="40%"><b>Username</b></th>
                     <th width="40%"><b>Total Points</b></th>        
                 </tr>
                 </thead>
 
-                <?php foreach ($all_user_points as  $board_entry): ?>
-
-                    <tr>
+                <?php foreach ($all_user_points as $board_entry): 
+                    $row_class = $dark_row ? 'table-danger' : 'table-warning';
+                    // Flip the value of $dark_row for the next iteration
+                    $dark_row = !$dark_row;
+                ?>
+                    <tr class="<?php echo $row_class; ?>">
                     <td><?php echo $board_entry['username']; ?></td>
                     <td><?php echo $board_entry['totalScore']; ?></td>
                     </tr>

@@ -131,3 +131,9 @@ input[type="checkbox"]:enabled {
     flex-direction: row;
     justify-content: space-between;
 }
+
+#modeSelect, #friendSelect, #timeSelect {
+   border-radius: 14px;
+   border-color: white;
+}
+
