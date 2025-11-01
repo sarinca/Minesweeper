@@ -38,6 +38,22 @@
 //     }
 // }
 
+// -------------------- SHOP FUNCTIONS -------------------- //
+
+function getShopItems(){
+    global $db;
+
+    $query = "SELECT name, description, price FROM itemInventory NATURAL JOIN itemDetails";
+    $statement = $db->prepare($query);
+    $statement->execute();
+    $results = $statement->fetchAll();
+    $statement->closeCursor();
+    return $results;
+}
+
+
+
+// -------------------- LEADERBOARD FUNCTIONS -------------------- //
 
 function getTopPointUsers(){
     global $db;
@@ -82,10 +98,10 @@ function processFiltering($gameMode, $userFriends, $timeRange){
 
     return $display_entries;
 
-    // //step 2: with display_entries as a param, filter based on user friends
+    // //step 2: with display_entries as a param, filter based on user friends - IMPLEMENT THIS LATER
     // if ($userFriends == 'friends'){
     //     //filter by friends only with the current user
-    //     //TODO: write this function
+    //     //TODO: WRITE THIS FUNCTION LATER - need to add a param to this function to capture the user id
     // }
 
     // //step 3: with display_entries as a param, filter based on time range IF a game mode is selected (not all-time)

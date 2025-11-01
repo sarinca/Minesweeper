@@ -37,6 +37,29 @@ body {
     vertical-align: middle;
 }
 
+/* ========== Shop Styles ========== */
+div.shop-card {
+    background-color: #FFD788; 
+    height:280px; 
+    border-radius:20px;
+    padding:20px;
+    margin-left:20px;
+    margin-right:20px;
+    position: relative;
+}
+
+div.warning-text {
+    position: absolute; 
+    bottom: 0; 
+    margin-bottom: 10px; 
+    font-size:14px; 
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
 /* ========== Sidebar Styles ========== */
 .vertical-nav {
     background-color: rgba(252, 245, 217);
