@@ -2,19 +2,7 @@
 require('connect-db.php');         // include() 
 require('request-db.php');
 
-$all_user_points = getTopPointUsers();   //get all rows in the table
-
-//bandaid while server doesn't respond
-// $all_user_points = [];
-
-// for ($i = 1; $i <= 20; $i++) {
-//     $all_user_points[] = [
-//         'username' => 'user' . $i,
-//         'totalScore' => rand(0, 1000) // Generates a random totalPoints between 0 and 1000
-//     ];
-// }
-
-// var_dump($all_user_points);
+$leaderboard_entries = getTopPointUsers();   //get all rows in the table
 
 $selected_mode = "allPoints";
 $selected_users = "allUsers";
@@ -23,6 +11,34 @@ $selected_time = "weekly";
 //controls rendering of the table
 $dark_row = false;
 
+//making values so we can dynamically select
+$game_mode_filter = [];
+$game_mode_filter[] = [
+    'mode' => 'Easy',
+    'text' => "Easy Mode Only" 
+];
+$game_mode_filter[] = [
+    'mode' => 'Medium',
+    'text' => "Medium Mode Only" 
+];
+$game_mode_filter[] = [
+    'mode' => 'Hard',
+    'text' => "Hard Mode Only" 
+];
+$game_mode_filter[] = [
+    'mode' => 'allPoints',
+    'text' => "Total Rank Points" 
+];
+
+$friend_filter = [];
+$friend_filter[] = [
+    'mode' => 'allUsers',
+    'text' => "All Users" 
+];
+$friend_filter[] = [
+    'mode' => 'friends',
+    'text' => "My Friends" 
+];
 ?>
 
 
@@ -40,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $selected_users = $_POST['friendSelect'];
     $selected_time = $_POST['timeSelect'];
 
+    $leaderboard_entries = processFiltering($selected_mode, $selected_users, $selected_time);
 
     //   addRequests($_POST['requestedDate'], $_POST['roomNo'], $_POST['requestedBy'], 
     //               $_POST['requestDesc'], $_POST['priority_option']);
@@ -122,14 +139,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
             <form method="post" action="<?php $_SERVER['PHP_SELF'] ?>">
                 <div style="display: flex; flex-direction: row;">
                     <select id="modeSelect" name="modeSelect" class="form-select m-2">
-                        <option value="allPoints" selected>Total Rank Points</option>
-                        <option value="easy">Easy Mode Only</option>
-                        <option value="med">Medium Mode Only</option>
-                        <option value="hard">Hard Mode Only</option>
+                        <?php foreach ($game_mode_filter as $game_mode): ?>
+                            <option value=<?php echo $game_mode['mode'] ?> <?php if ($selected_mode == $game_mode['mode']) echo 'selected'; ?>>
+                                <?php echo $game_mode['text'] ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                     <select id="friendSelect" name="friendSelect" class="form-select m-2">
-                        <option value="allUsers" selected>All Users</option>
-                        <option value="friends">My Friends</option>
+                        <?php foreach ($friend_filter as $friend_mode): ?>
+                            <option value=<?php echo $friend_mode['mode'] ?> <?php if ($selected_users == $friend_mode['mode']) echo 'selected'; ?>>
+                                <?php echo $friend_mode['text'] ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                     <select id="timeSelect" name="timeSelect" class="form-select m-2">
                         <option value="weekly" selected>This Week</option>
@@ -137,29 +158,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
                         <option value="monthly">This Month</option>
                         <option value="allTime">All Time</option>
                     </select>
-                    <input class="btn m-2" type="submit" Value="refresh!" name="refreshBtn">
+                    <input class="btn m-2" style="background-color: #FFD788" type="submit" Value="refresh!" name="refreshBtn">
                     </input>
                 </div>
             </form>
             
 
             <div class="row justify-content-center">  
-            <table class="table" style="width:90%">
+            <table class="table mt-3" style="width:90%">
                 <thead style="--bs-table-bg:rgba(249, 215, 143); border-color:rgba(249, 215, 143)">
                 <tr>
                     <th width="40%"><b>Username</b></th>
-                    <th width="40%"><b>Total Points</b></th>        
+                    <?php if ($selected_mode == "allPoints") {echo "<th width='40%'><b>Total Points</b></th>"; }?>   
+                    <?php if ($selected_mode != "allPoints") {echo "<th width='40%'><b>Mode</b></th>"; }?> 
+                    <?php if ($selected_mode != "allPoints") {echo "<th width='40%'><b>Finish Time</b></th>"; }?>   
                 </tr>
                 </thead>
 
-                <?php foreach ($all_user_points as $board_entry): 
+                <?php foreach ($leaderboard_entries as $board_entry): 
                     $row_class = $dark_row ? 'table-danger' : 'table-warning';
                     // Flip the value of $dark_row for the next iteration
                     $dark_row = !$dark_row;
                 ?>
                     <tr class="<?php echo $row_class; ?>">
                     <td><?php echo $board_entry['username']; ?></td>
-                    <td><?php echo $board_entry['totalScore']; ?></td>
+                    <?php if ($selected_mode == "allPoints") { echo "<td>" . $board_entry['totalScore'] . "</td>"; } ?>
+                    <?php if ($selected_mode != "allPoints") { echo "<td>" . $board_entry['mode'] . "</td>"; } ?>
+                    <?php if ($selected_mode != "allPoints") { echo "<td>" . $board_entry['gameTime'] . "</td>"; } ?>
                     </tr>
                 <?php endforeach; ?>
             </table>
