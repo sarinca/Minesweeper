@@ -10,17 +10,17 @@ $gamemodeInfo = null;
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     if (!empty($_POST['easyBtn'])){
         $mode = "Easy";
+        $gamemodeInfo = getGamemodeInfo($mode);
+        addNewGame($gamemodeInfo);
     } else if (!empty($_POST['mediumBtn'])) {
         $mode = "Medium";
+        $gamemodeInfo = getGamemodeInfo($mode);
+        addNewGame($gamemodeInfo);
     } else if (!empty($_POST['hardBtn'])){
         $mode = "Hard";
+        $gamemodeInfo = getGamemodeInfo($mode);
+        addNewGame($gamemodeInfo);
     }
-    $gamemodeInfo = getGamemodeInfo($mode);
-    $row = $gamemodeInfo->fetch_assoc();
-
-    $height = $row['height'];
-    $width = $row['width'];
-    $numBombs = $row['numBombs'];
 }
 ?>
 
