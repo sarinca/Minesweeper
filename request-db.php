@@ -402,7 +402,7 @@ function deleteGame($game_id) {
 function getGamemodeInfo($mode){
     global $db;
 
-    $query = "SELECT height, width, numBombs FROM gamemode WHERE mode = :mode";
+    $query = "SELECT mode, height, width, numBombs FROM gamemode WHERE mode = :mode";
     $statement = $db->prepare($query);
     $statement->bindValue(':mode', $mode);
 
@@ -413,8 +413,55 @@ function getGamemodeInfo($mode){
     return $results;
 }
 
-function addNewGame(){
+function addNewGame($gameInfo){
+    global $db;
+
+    $row = $gamemodeInfo->fetch_assoc();
+
+    $mode = $row['mode'];
+    $height = $row['height'];
+    $width = $row['width'];
+    $numBombs = $row['numBombs'];
+
+    $totalCells = $height * $width;
+
+    $boxesClicked = array_fill(0, $totalCells, "0");
+    $bombPlacement = array_fill(0, $totalCells-$numBombs, "0");
+    for ($i = 0; $i < $numBombs; $i++){
+        array_push($bombPlacement, "1");
+    }
+    shuffle($state_bombPlacement);
+
+    $state_boxesClicked = implode("", $boxesClicked);
+    $state_bombPlacement = implode("", $bombPlacement);
+
+
+    $gameTime = 0;
     
+    $query = "INSERT INTO game (
+    userId, 
+    state_boxesClicked, 
+    state_bombPlacement, 
+    mode, 
+    gameTime)
+    VALUES (
+    :userId,
+    :state_boxesClicked,
+    :state_bombPlacement,
+    :mode,
+    :gameTime)";
+
+    $statement = $db->prepare($query);
+
+    $statement->bindValue(':userId', $userId); // is this accessible anywhere?
+    $statement->bindValue(':state_boxesClicked', $state_boxesClicked);
+    $statement->bindValue(':state_bombPlacement', $state_bombPlacement);
+    $statement->bindValue(':mode', $mode);
+    $statement->bindValue(':gameTime', $gameTime);
+
+    $statement->execute();
+    $statement->closeCursor();
+
 }
 
 ?>
