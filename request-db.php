@@ -94,4 +94,24 @@ function processFiltering($gameMode, $userFriends, $timeRange){
     // }
 }
 
+/* Functions for creating the game **/ 
+
+function getGamemodeInfo($mode){
+    global $db;
+
+    $query = "SELECT height, width, numBombs FROM gamemode WHERE mode = :mode";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':mode', $mode);
+
+    $statement->execute();
+    $results = $statement->fetch(); 
+    $statement->closeCursor();
+    
+    return $results;
+}
+
+function addNewGame(){
+    
+}
+
 ?>
