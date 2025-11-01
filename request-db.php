@@ -95,6 +95,7 @@ function register($email, $username, $password) {
 }
 
 // -------------------- LOGIN FUNCTIONS -------------------- //
+
 function login($username) {
     global $db;
     $query = "SELECT * FROM user WHERE username = :username";
@@ -395,4 +396,25 @@ function deleteGame($game_id) {
 
     return $success;
 }
+
+// ---------------------- GAME FUNCTIONS ---------------------- //
+
+function getGamemodeInfo($mode){
+    global $db;
+
+    $query = "SELECT height, width, numBombs FROM gamemode WHERE mode = :mode";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':mode', $mode);
+
+    $statement->execute();
+    $results = $statement->fetch(); 
+    $statement->closeCursor();
+    
+    return $results;
+}
+
+function addNewGame(){
+    
+}
+
 ?>
