@@ -414,14 +414,15 @@ function getGamemodeInfo($mode){
 }
 
 function addNewGame($gameInfo){
+    echo "Adding new game...";
     global $db;
 
-    $row = $gamemodeInfo->fetch_assoc();
+    $mode = $gameInfo['mode'];
+    $height = $gameInfo['height'];
+    $width = $gameInfo['width'];
+    $numBombs = $gameInfo['numBombs'];
 
-    $mode = $row['mode'];
-    $height = $row['height'];
-    $width = $row['width'];
-    $numBombs = $row['numBombs'];
+    echo "received info for mode, height, width, numBombs";
 
     $totalCells = $height * $width;
 
@@ -430,13 +431,15 @@ function addNewGame($gameInfo){
     for ($i = 0; $i < $numBombs; $i++){
         array_push($bombPlacement, "1");
     }
-    shuffle($state_bombPlacement);
+    shuffle($bombPlacement);
 
     $state_boxesClicked = implode("", $boxesClicked);
     $state_bombPlacement = implode("", $bombPlacement);
 
+    $userId = 1; //$_SESSION['userId'];
 
     $gameTime = 0;
+    echo "querying...";
     
     $query = "INSERT INTO game (
     userId, 
@@ -451,16 +454,24 @@ function addNewGame($gameInfo){
     :mode,
     :gameTime)";
 
-    $statement = $db->prepare($query);
+    try{
+        $statement = $db->prepare($query);
 
-    $statement->bindValue(':userId', $userId); // is this accessible anywhere?
-    $statement->bindValue(':state_boxesClicked', $state_boxesClicked);
-    $statement->bindValue(':state_bombPlacement', $state_bombPlacement);
-    $statement->bindValue(':mode', $mode);
-    $statement->bindValue(':gameTime', $gameTime);
+        $statement->bindValue(':userId', $userId); // is this accessible anywhere?
+        $statement->bindValue(':state_boxesClicked', $state_boxesClicked);
+        $statement->bindValue(':state_bombPlacement', $state_bombPlacement);
+        $statement->bindValue(':mode', $mode);
+        $statement->bindValue(':gameTime', $gameTime);
 
-    $statement->execute();
-    $statement->closeCursor();
+        $statement->execute();
+        $statement->closeCursor();
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
 
 }
 

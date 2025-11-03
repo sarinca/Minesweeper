@@ -1,7 +1,7 @@
 <?php
 require('connect-db.php');    
 require('request-db.php');
-
+$mode = null;
 $gamemodeInfo = null;
 
 ?>
@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     if (!empty($_POST['easyBtn'])){
         $mode = "Easy";
         $gamemodeInfo = getGamemodeInfo($mode);
+        var_dump($gamemodeInfo);
         addNewGame($gamemodeInfo);
     } else if (!empty($_POST['mediumBtn'])) {
         $mode = "Medium";
