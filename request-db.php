@@ -38,21 +38,22 @@
 //     }
 // }
 
-// function getRequestById($id)  
-// {
-//     global $db; 
+// -------------------- SHOP FUNCTIONS -------------------- //
 
-//     $query = "SELECT * FROM requests WHERE reqId = :id";
-//     $statement = $db->prepare($query);
-//     $statement->bindValue(':id', $id);  //this minimizes security risk
+function getShopItems(){
+    global $db;
 
-//     $statement->execute();
-//     $results = $statement->fetch(); 
-//     $statement->closeCursor();
+    $query = "SELECT name, description, price FROM itemInventory NATURAL JOIN itemDetails";
+    $statement = $db->prepare($query);
+    $statement->execute();
+    $results = $statement->fetchAll();
+    $statement->closeCursor();
+    return $results;
+}
 
-//     return $results;
 
-// }
+
+// -------------------- LEADERBOARD FUNCTIONS -------------------- //
 
 function getTopPointUsers(){
     global $db;
@@ -65,29 +66,48 @@ function getTopPointUsers(){
     return $results;
 }
 
-// function processFiltering($gameMode, $userFriends, $timeRange){
-//     global $db;
+function getEntriesByMode($mode)  
+{
+    global $db; 
 
-//     $display_entries = null;
+    $query = "SELECT lead.gameId as gameId, game.gameTime as gameTime, profile.username as username, game.mode as mode
+    FROM leaderboardEntry AS lead NATURAL JOIN game NATURAL JOIN profile
+    WHERE mode = :mode
+    ORDER BY gameTime ASC";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':mode', $mode);  //this minimizes security risk
 
-//     //step 1: filter based on game mode OR all-time
-//     if ($gameMode == 'easy' || $gameMode == 'med' || $gameMode == 'hard'){
-//         //filter by game mode from a diff table
-//         //TODO: write this function
-//     } else {
-//         $display_entries = getTopPointUsers();
-//     }
+    $statement->execute();
+    $results = $statement->fetchAll(); 
+    $statement->closeCursor();
 
-//     //step 2: with display_entries as a param, filter based on user friends
-//     if ($userFriends == 'friends'){
-//         //filter by friends only with the current user
-//         //TODO: write this function
-//     }
+    return $results;
+}
 
-//     //step 3: with display_entries as a param, filter based on time range IF a game mode is selected (not all-time)
-//     if ($gameMode != 'allPoints'){
-//         //TODO: filter game entries by completion date
-//     }
-// }
+function processFiltering($gameMode, $userFriends, $timeRange){
+    global $db;
+
+    $display_entries = [];
+
+    //step 1: filter based on game mode OR all-time
+    if ($gameMode == 'Easy' || $gameMode == 'Medium' || $gameMode == 'Hard'){
+        $display_entries = getEntriesByMode($gameMode);
+    } else {
+        $display_entries = getTopPointUsers();
+    }
+
+    return $display_entries;
+
+    // //step 2: with display_entries as a param, filter based on user friends - IMPLEMENT THIS LATER
+    // if ($userFriends == 'friends'){
+    //     //filter by friends only with the current user
+    //     //TODO: WRITE THIS FUNCTION LATER - need to add a param to this function to capture the user id
+    // }
+
+    // //step 3: with display_entries as a param, filter based on time range IF a game mode is selected (not all-time)
+    // if ($gameMode != 'allPoints'){
+    //     //TODO: filter game entries by completion date
+    // }
+}
 
 ?>
