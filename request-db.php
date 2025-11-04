@@ -440,21 +440,22 @@ function addNewGame($gameInfo){
 
     $gameTime = 0;
     echo "querying...";
-    
-    $query = "INSERT INTO game (
-    userId, 
-    state_boxesClicked, 
-    state_bombPlacement, 
-    mode, 
-    gameTime)
-    VALUES (
-    :userId,
-    :state_boxesClicked,
-    :state_bombPlacement,
-    :mode,
-    :gameTime)";
 
     try{
+
+        $query = "INSERT INTO game (
+        userId, 
+        state_boxesClicked, 
+        state_bombPlacement, 
+        mode, 
+        gameTime)
+        VALUES (
+        :userId,
+        :state_boxesClicked,
+        :state_bombPlacement,
+        :mode,
+        :gameTime)";
+
         $statement = $db->prepare($query);
 
         $statement->bindValue(':userId', $userId); // is this accessible anywhere?
@@ -462,9 +463,28 @@ function addNewGame($gameInfo){
         $statement->bindValue(':state_bombPlacement', $state_bombPlacement);
         $statement->bindValue(':mode', $mode);
         $statement->bindValue(':gameTime', $gameTime);
-
         $statement->execute();
         $statement->closeCursor();
+
+        $gameId = $db->lastInsertId();
+
+        $query2 = "INSERT INTO state (
+        gameId,
+        state_boxesClicked,
+        state_bombPlacement)
+        VALUES (
+        :gameId,
+        :state_boxesClicked,
+        :state_bombPlacement)";
+
+        $statement2 = $db->prepare($query2);
+
+        $statement2->bindValue(':gameId', $gameId); // is this accessible anywhere?
+        $statement2->bindValue(':state_boxesClicked', $state_boxesClicked);
+        $statement2->bindValue(':state_bombPlacement', $state_bombPlacement);
+        $statement2->execute();
+        $statement2->closeCursor();  
+
     }
     catch (PDOException $e) {
         echo $e->getMessage(); // make more generic to not leak sensitive data
@@ -474,5 +494,8 @@ function addNewGame($gameInfo){
     }
 
 }
+
+/* Functions for updating/playing the game */
+
 
 ?>
