@@ -2,8 +2,16 @@
 require('connect-db.php');    
 require('request-db.php');
 
-$height = 10;
-$width = 10;
+$gameId = $_GET['gameId'];
+
+$gameInfo = getGameInfo($gameId);
+$mode = $gameInfo['mode'];
+
+$gamemodeInfo = getGamemodeInfo($mode);
+
+$height = $gamemodeInfo['height'];
+$width = $gamemodeInfo['width'];
+echo "game.php loaded";
 ?>
 
 <!DOCTYPE html>
@@ -50,6 +58,16 @@ $width = 10;
             </div>
         </div>
     </nav>
+
+    <div class="nav flex-row">
+        <ul class="vertical-nav">
+            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="leaderboard.php">Leaderboard</a>
+            <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
+            or disable them? -->
+            <a class="nav-link disabled" href="shop.html" tabindex="-1" aria-disabled="true">Shop</a>
+        </ul>
+    </div>
 
 
 </body>
