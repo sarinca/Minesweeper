@@ -492,10 +492,30 @@ function addNewGame($gameInfo){
     catch (Exception $e){
         echo $e->getMessage(); //make more generic to not leak sensitive data
     }
+    header("Location: game.php?gameId=" . $gameId);
+    exit();
 
 }
 
 /* Functions for updating/playing the game */
+
+function getGameInfo($gameId){
+    global $db;
+
+    $query = "SELECT * FROM game WHERE gameId = :gameId";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':gameId', $gameId);
+
+    $statement->execute();
+    $results = $statement->fetch(); 
+    $statement->closeCursor();
+    
+    return $results;
+}
+
+function updateGameTime(){
+
+}
 
 
 ?>
