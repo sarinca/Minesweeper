@@ -3,10 +3,11 @@ require('connect-db.php');         // include()
 require('request-db.php');
 
 $leaderboard_entries = getTopPointUsers();   //get all rows in the table
+$slider_range = null;
 
 $selected_mode = "allPoints";
 $selected_users = "allUsers";
-$selected_time = "weekly";
+$selected_time = 50;
 
 //controls rendering of the table
 $dark_row = false;
@@ -45,26 +46,26 @@ $friend_filter[] = [
 <?php 
 if ($_SERVER['REQUEST_METHOD'] == 'POST')  
 {
-   if (!empty($_POST['refreshBtn']))
-   {
     //idea here: filter the entries accordingly
     echo "Mode selected: " . $_POST['modeSelect'];
     echo "Friend users selected: " . $_POST['friendSelect'];
-    echo "Time range selected: " . $_POST['timeSelect'];
+    echo "Max time selected: " . $_POST['myRange'];
 
     $selected_mode = $_POST['modeSelect'];
     $selected_users = $_POST['friendSelect'];
-    $selected_time = $_POST['timeSelect'];
+    $selected_time = $_POST['myRange'];
 
     $leaderboard_entries = processFiltering($selected_mode, $selected_users, $selected_time);
 
-    //   addRequests($_POST['requestedDate'], $_POST['roomNo'], $_POST['requestedBy'], 
-    //               $_POST['requestDesc'], $_POST['priority_option']);
+    //update the ranges for the search
+    $slider_range = [];
 
-    //   //read the table values again (refresh)
-    //   $list_of_requests = getAllRequests();
+    if ($selected_mode != 'allPoints' && count($leaderboard_entries) != 0){
+        $slider_range[] = $leaderboard_entries[0]['gameTime'];
+        $slider_range[] = $leaderboard_entries[count($leaderboard_entries) - 1]['gameTime'];
+        $slider_range[] = (int) (($slider_range[0] + $slider_range[1]) / 2);    //median to start the slider
+    } 
    } 
-}
 ?>
 
 
@@ -137,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         </ul>
         <div class="m-5" style="width:68%;"> 
             <h2 class="mb-5"> Leaderboard </h2>
-            <form method="post" action="<?php $_SERVER['PHP_SELF'] ?>">
+            <form method="post" id="myForm" action="<?php $_SERVER['PHP_SELF'] ?>">
                 <div style="display: flex; flex-direction: row;">
                     <select id="modeSelect" name="modeSelect" class="form-select m-2">
                         <?php foreach ($game_mode_filter as $game_mode): ?>
@@ -153,14 +154,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <select id="timeSelect" name="timeSelect" class="form-select m-2">
-                        <option value="weekly" selected>This Week</option>
-                        <option value="today">Today</option>
-                        <option value="monthly">This Month</option>
-                        <option value="allTime">All Time</option>
-                    </select>
-                    <input class="btn m-2" style="background-color: #FFD788" type="submit" Value="refresh!" name="refreshBtn">
-                    </input>
+                    <div class="container m-2">
+                        <div class="dropdown">
+                            <button class="btn btn-light form-select" 
+                            id="dropdownMenuButton" data-bs-toggle="dropdown" <?php if ($selected_mode == "allPoints") {echo "disabled";}?>>
+                                Finish times faster than... 
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <div class="slider-container p-2">
+                                    <input type="range" min="<?php echo $slider_range[0]?>" max="<?php echo $slider_range[1]?>" value="<?php echo $slider_range[2]?>" class="slider" name="myRange" id="myRange">
+                                    <p>Completion times faster than: <span id="sliderValue" style='font-size: 25px;'><?php echo $slider_range[2]?></span> seconds</p>
+                                </div>
+                            </ul>
+                        </div>
+                    </div>
+                    <input type="hidden" name="sliderValue" id="sliderValueInput"/>
+                    <input type="hidden" name="mode" id="modeInput"/>
+                    <input type="hidden" name="friends" id="friendsInput"/>
                 </div>
             </form>
             
@@ -199,6 +209,55 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
 <!-- <script src='maintenance-system.js'></script> -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script>
+    const slider = document.getElementById("myRange");
+    const output = document.getElementById("sliderValue");
+    const modeSelect = document.getElementById("modeSelect");
+    const friendSelect = document.getElementById("friendSelect");
+    output.innerHTML = slider.value;
+
+    //update the slider visualization on change
+    slider.oninput = function() {
+        output.innerHTML = this.value;
+    }
+
+    //disable the slider when all-time scores are selected in the filter
+    const select = document.getElementById("modeSelect");
+
+    const dropdownButton = document.getElementById("dropdownMenuButton");
+
+    select.addEventListener("change", function() {
+        // Check if the selected value is "allPoints"
+        if (this.value === "allPoints") {
+            dropdownButton.disabled = true; // Disable the dropdown button
+        } else {
+            dropdownButton.disabled = false; // Enable it for other values
+        }
+    });
+
+    //added new
+        // Update leaderboard on dropdown change
+    function updateLeaderboard() {
+        const mode = modeSelect.value;
+        const friends = friendSelect.value;
+        const sliderValue = slider.value;
+
+        // Update hidden fields with current values
+        document.getElementById("sliderValueInput").value = slider.value;
+        document.getElementById("modeInput").value = modeSelect.value;
+        document.getElementById("friendsInput").value = friendSelect.value;
+
+        //submit the form to handle the filtering logic
+        document.getElementById("myForm").submit();
+
+    }
+
+    // Attach event listeners to the dropdowns
+    modeSelect.addEventListener("change", updateLeaderboard);
+    friendSelect.addEventListener("change", updateLeaderboard);
+    slider.addEventListener("change", updateLeaderboard);
+
+</script>
 
 </body>
 </html>

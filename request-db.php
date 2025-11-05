@@ -84,7 +84,7 @@ function getEntriesByMode($mode)
     return $results;
 }
 
-function processFiltering($gameMode, $userFriends, $timeRange){
+function processFiltering($gameMode, $userFriends, $timeMax){
     global $db;
 
     $display_entries = [];
