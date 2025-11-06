@@ -84,7 +84,7 @@ function getEntriesByMode($mode)
     return $results;
 }
 
-function processFiltering($gameMode, $userFriends, $timeMax){
+function processFiltering($gameMode, $userFriends){
     global $db;
 
     $display_entries = [];
@@ -92,11 +92,12 @@ function processFiltering($gameMode, $userFriends, $timeMax){
     //step 1: filter based on game mode OR all-time
     if ($gameMode == 'Easy' || $gameMode == 'Medium' || $gameMode == 'Hard'){
         $display_entries = getEntriesByMode($gameMode);
+        //also filter by time here
     } else {
         $display_entries = getTopPointUsers();
     }
 
-    return $display_entries;
+    //return $display_entries;
 
     // //step 2: with display_entries as a param, filter based on user friends - IMPLEMENT THIS LATER
     // if ($userFriends == 'friends'){
@@ -104,10 +105,20 @@ function processFiltering($gameMode, $userFriends, $timeMax){
     //     //TODO: WRITE THIS FUNCTION LATER - need to add a param to this function to capture the user id
     // }
 
-    // //step 3: with display_entries as a param, filter based on time range IF a game mode is selected (not all-time)
-    // if ($gameMode != 'allPoints'){
-    //     //TODO: filter game entries by completion date
+    return $display_entries;
     // }
+}
+
+function timeFiltering($entries, $timeMax){
+    echo "time max: " . $timeMax;
+    // //step 3: with display_entries as a param, filter based on time range IF a game mode is selected (not all-time)
+    if ($timeMax != 0 && $timeMax !== null) {
+        // Filter game entries by completion date
+        $entries = array_filter($entries, function($game) use ($timeMax) {
+            return $game['gameTime'] < $timeMax; 
+        });
+    }
+    return $entries;
 }
 
 ?>

@@ -4,10 +4,11 @@ require('request-db.php');
 
 $leaderboard_entries = getTopPointUsers();   //get all rows in the table
 $slider_range = null;
+$default_slider_value = "50";
 
 $selected_mode = "allPoints";
 $selected_users = "allUsers";
-$selected_time = 50;
+$selected_time = 0;
 
 //controls rendering of the table
 $dark_row = false;
@@ -46,25 +47,55 @@ $friend_filter[] = [
 <?php 
 if ($_SERVER['REQUEST_METHOD'] == 'POST')  
 {
-    //idea here: filter the entries accordingly
-    echo "Mode selected: " . $_POST['modeSelect'];
-    echo "Friend users selected: " . $_POST['friendSelect'];
-    echo "Max time selected: " . $_POST['myRange'];
 
     $selected_mode = $_POST['modeSelect'];
     $selected_users = $_POST['friendSelect'];
-    $selected_time = $_POST['myRange'];
 
-    $leaderboard_entries = processFiltering($selected_mode, $selected_users, $selected_time);
+    // echo "range: " . $_POST["myRange"] . "<br>";
 
-    //update the ranges for the search
-    $slider_range = [];
+    //handle the filter time
+    if ($selected_mode == 'allPoints' ) {
+        $selected_time = null; // Or use a large number to allow all entries
+        // echo "NULL TIME bc ALL POINTS";
+    } else if ($_POST['myRange'] == $default_slider_value) {
+        $selected_time = null;
+        // echo "NULL TIME bc default selected";
+    } else{
+        $selected_time = $_POST['myRange'];
+    }
 
-    if ($selected_mode != 'allPoints' && count($leaderboard_entries) != 0){
-        $slider_range[] = $leaderboard_entries[0]['gameTime'];
-        $slider_range[] = $leaderboard_entries[count($leaderboard_entries) - 1]['gameTime'];
-        $slider_range[] = (int) (($slider_range[0] + $slider_range[1]) / 2);    //median to start the slider
-    } 
+    // echo "Mode selected: " . $_POST['modeSelect'];
+    // echo "Friend users selected: " . $_POST['friendSelect'];
+    // echo "Max time selected: " . $selected_time;
+
+    //if mode changed, then update slider range
+   if ($_POST['modeSelect'] != "allPoints") {
+        $leaderboard_entries = processFiltering($selected_mode, $selected_users);
+        // echo "SLIDER VAL CAPTURED: " . $_POST['myRange'];
+        $leaderboard_entries = timeFiltering($leaderboard_entries, $selected_time);
+    } else {
+        $leaderboard_entries = processFiltering($selected_mode, $selected_users);
+    }
+
+    //added to make the slider
+    $slider_max_easy = 600; // Assign max value for Easy
+    $slider_max_medium = 800; // Assign max value for Medium
+    $slider_max_hard = 1000; // Assign max value for Hard
+
+   // Set $slider_max based on selected mode
+    switch ($selected_mode) {
+        case 'Easy':
+            $slider_max = $slider_max_easy;
+            break;
+        case 'Medium':
+            $slider_max = $slider_max_medium;
+            break;
+        case 'Hard':
+            $slider_max = $slider_max_hard;
+            break;
+        default:
+            $slider_max = 0; // Default value (could be an allPoints case)
+    }
    } 
 ?>
 
@@ -97,6 +128,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         tr.table-danger {
             --bs-table-bg: #FFD788 !important; /* Dark Yellow */
             border-color: #FFD788 !important;
+        }
+        .btn-light {
+            --bs-btn-bg: #ffffff;
+            --bs-btn-hover-bg: #ffffff;
+            --bs-btn-hover-border-color: #ffffff;
+            --bs-btn-border-radius: 14px;
+                --bs-btn-active-bg: #ffffff;
         }
     </style>
 </head>
@@ -162,8 +200,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <div class="slider-container p-2">
-                                    <input type="range" min="<?php echo $slider_range[0]?>" max="<?php echo $slider_range[1]?>" value="<?php echo $slider_range[2]?>" class="slider" name="myRange" id="myRange">
-                                    <p>Completion times faster than: <span id="sliderValue" style='font-size: 25px;'><?php echo $slider_range[2]?></span> seconds</p>
+                                    <input type="range" min="0" max="<?php echo $slider_max; ?>" value="<?php echo $selected_time; ?>" class="slider" name="myRange" id="myRange">
+                                    <p>Completion times faster than: <span id="sliderValue" style='font-size: 25px;'><?php echo $selected_time; ?></span> seconds</p>
                                 </div>
                             </ul>
                         </div>
