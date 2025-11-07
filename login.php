@@ -100,7 +100,7 @@ $message = "";
     <body>
         <nav class="navbar navbar-expand-md px-3 d-none d-md-block">
             <div class="container-fluid">
-                <a class="navbar-brand navbar-parent" href="?command=home">Minesweeper</a>
+                <a class="navbar-brand navbar-parent" href="index.html">Minesweeper</a>
             </div>
         </nav>
 

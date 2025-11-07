@@ -38,6 +38,56 @@
 //     }
 // }
 
+// -------------------- REGISTER FUNCTIONS -------------------- //
+function check_registration($email, $username) {
+    global $db;
+    $query = "SELECT * FROM user WHERE email = :email OR username = :username";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':email', $email);
+    $statement->bindValue(':username', $username);
+    $statement->execute();
+    $results = $statement->fetch(); // fetch() only the first row, fetchAll() every row
+    $statement->closeCursor();
+    return $results;
+}
+
+function register($email, $username, $password) {
+    global $db;
+    $query = "INSERT INTO user (email, username, password) VALUES (:email, :username, :password)";  
+    try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':email', $email);
+        $statement->bindValue(':username', $username);
+        $statement->bindValue(':password', $password);
+        $statement->execute();
+
+        $statement->closeCursor();
+    }
+    catch (PDOException $e) 
+    {
+        echo $e->getMessage();
+
+        // if there is a specific SQL-related error message
+        //    echo "generic message (don't reveal SQL-specific message)";
+    }
+    catch (Exception $e)
+    {
+       echo $e->getMessage();    // be careful, try to make it generic
+    }
+}
+
+// -------------------- LOGIN FUNCTIONS -------------------- //
+function login($username) {
+    global $db;
+    $query = "SELECT * FROM user WHERE username = :username";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':username', $username);
+    $statement->execute();
+    $results = $statement->fetch(); // fetch() only the first row, fetchAll() every row
+    $statement->closeCursor();
+    return $results;
+}
+
 // -------------------- SHOP FUNCTIONS -------------------- //
 
 function getShopItems(){
