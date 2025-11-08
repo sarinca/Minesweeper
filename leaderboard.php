@@ -51,27 +51,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $selected_mode = $_POST['modeSelect'];
     $selected_users = $_POST['friendSelect'];
 
-    // echo "range: " . $_POST["myRange"] . "<br>";
-
     //handle the filter time
     if ($selected_mode == 'allPoints' ) {
         $selected_time = null; // Or use a large number to allow all entries
-        // echo "NULL TIME bc ALL POINTS";
     } else if ($_POST['myRange'] == $default_slider_value) {
         $selected_time = null;
-        // echo "NULL TIME bc default selected";
     } else{
         $selected_time = $_POST['myRange'];
     }
 
-    // echo "Mode selected: " . $_POST['modeSelect'];
-    // echo "Friend users selected: " . $_POST['friendSelect'];
-    // echo "Max time selected: " . $selected_time;
-
     //if mode changed, then update slider range
    if ($_POST['modeSelect'] != "allPoints") {
         $leaderboard_entries = processFiltering($selected_mode, $selected_users);
-        // echo "SLIDER VAL CAPTURED: " . $_POST['myRange'];
         $leaderboard_entries = timeFiltering($leaderboard_entries, $selected_time);
     } else {
         $leaderboard_entries = processFiltering($selected_mode, $selected_users);

@@ -178,7 +178,6 @@ function processFiltering($gameMode, $userFriends){
 }
 
 function timeFiltering($entries, $timeMax){
-    echo "time max: " . $timeMax;
     // //step 3: with display_entries as a param, filter based on time range IF a game mode is selected (not all-time)
     if ($timeMax != 0 && $timeMax !== null) {
         // Filter game entries by completion date
