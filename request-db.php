@@ -74,6 +74,24 @@ function register($email, $username, $password) {
     {
        echo $e->getMessage();    // be careful, try to make it generic
     }
+
+    //second query to insert into the profile table
+    $queryProfile = "INSERT INTO profile (username, points, totalScore, profilePicture_path) VALUES (:username, 0, 0, NULL)";  
+    try {
+        $statementP = $db->prepare($queryProfile);
+        $statementP->bindValue(':username', $username);
+        $statementP->execute();
+
+        $statementP->closeCursor();
+    }
+    catch (PDOException $e) 
+    {
+        echo $e->getMessage();
+    }
+    catch (Exception $e)
+    {
+       echo $e->getMessage();
+    }
 }
 
 // -------------------- LOGIN FUNCTIONS -------------------- //
