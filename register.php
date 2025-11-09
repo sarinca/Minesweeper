@@ -170,7 +170,7 @@ $message = "";
                                     <label for="password" class="form-label">Password</label>
                                     <input type="password" id="password" class="form-control rounded-pill" name="password" placeholder="Enter password" required>
                                     <div id="passwordHelpBlock" class="form-text d-none">
-                                        Your password must contain ...
+                                        Your password must contain a minimum of eight characters and at least one uppercase letter, one lowercase letter, one number, and one special character.
                                     </div>
                                 </div>
                                 <button type="submit" class="btn rounded-pill loginbtn w-100" style="background-color: #fbe9af; border-color: #fbe9af;">Register</button>
