@@ -28,8 +28,8 @@ $message = "";
                 }
 
                 // check that password format is correct
-                // WHAT SHOULD WE ALLOW AS PASSWORDS GUYS? right now just alphanumeric cause i know the reg expression lol
-                else if (!preg_match('/^\w+$/', $_POST["password"])) {
+                // minimum eight characters, at least one uppercase letter, one lowercase letter, one number, one special character
+                else if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/", $_POST["password"])) {
                     $message = "<p class='alert alert-danger'>Invalid password format. Please try again.</p>";
                     //include("register.php");
                     //return;
@@ -240,7 +240,7 @@ $message = "";
                         isValid = false;
                     }
                 
-                    passwordRegex = /^\w+$/;
+                    passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
                     if (!passwordRegex.test(password.value)) {
                         errorMessage = "Invalid password format. Please try again.";
                         isValid = false;
