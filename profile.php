@@ -1,34 +1,263 @@
-<?php 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+<?php
+session_start();
+require_once('connect-db.php');
+require_once('request-db.php');
 
-require('connect-db.php');
-require('request-db.php');
+$user_id = 1;
 
-$user_id = 1; // NOTE: I'LL GET THIS FROM NATALIA LATER? WHATEVER ID THE USER LOGS IN WITH
-$user_stats = getUserStats($user_id);
-$games_played = getGamesPlayed($user_id);
-$friends_list = getUserFriends($user_id);
-$game_history = getGameHistory($user_id);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!empty($_POST['deleteFriendBtn'])) {
+        deleteFriend($user_id, $_POST['friend_id']);
+    } elseif (!empty($_POST['deleteGameBtn'])) {
+        deleteGame($_POST['game_id']);
+    }
+}
+
+$userStats = getUserStats($user_id);
+$gamesPlayed = getGamesPlayed($user_id);
+$gameHistory = getGameHistory($user_id);
+$userFriends = getUserFriends($user_id);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minesweeper</title>
-
-    <link rel="shortcut icon" type="image/x-icon"
-        href="https://static.vecteezy.com/system/resources/previews/042/608/027/non_2x/simple-flag-line-icon-free-vector.jpg" />
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <meta charset="utf-8">
+    <title>User Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgba(252, 245, 217);
+            color: #000;
+            font-family: system-ui, sans-serif;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            background-color: rgba(252, 245, 217);
+            border-bottom: 8px solid rgb(243, 236, 210);
+        }
+
+        .navbar-parent {
+            font-family: system-ui, sans-serif;
+            font-style: normal;
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .profile-dropdown {
+            background-color: rgba(252, 245, 217);
+            width: 100px;
+        }
+
+        #profile-select:hover {
+            cursor: pointer;
+        }
+
+        .vertical-nav {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            width: 200px;
+            height: calc(100vh - 70px);
+            background-color: rgba(252, 245, 217);
+            padding: 2rem 0;
+            z-index: 999;
+        }
+
+        .vertical-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .vertical-nav .nav-link {
+            color: #000000ff;
+            padding: 1rem 1.5rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            display: block;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .vertical-nav .nav-link:hover {
+            background-color: #fbe9af;
+            border-left-color: #ffc562;
+        }
+
+        .container {
+            margin-left: 220px;
+            margin-top: 150px;
+            padding: 2rem;
+            max-width: 750px;
+            
+        }
+
+        #name\&stats {
+            background: transparent;
+            padding: 0;
+        }
+
+        .user-and-pfp {
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        h1 {
+            margin-top: 50px;
+            margin-left: 10px;
+            color: #000000ff;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-top: 20px;
+        }
+
+        #bigPfp {
+            margin-top: 50px;
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            vertical-align: middle;
+        }
+
+        .stats-container {
+            padding: 15px;
+            max-width: 750px;
+            color: #000000ff;
+            font-weight: bold;
+            background-color: #f9c74f;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 15px;
+        }
+
+        .stat-box {
+            padding: 15px;
+            width: fit-content;;
+            display: flex;
+            flex-direction: column;
+            background-color: #fbe9af;
+            color: #000000ff; 
+            border-radius: 5px; 
+            padding: 4px 8px;
+            margin-left: 6px; 
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .stats-container p {
+            display: flex;
+            align-items: center;
+            margin: 0;
+            padding: 0.5rem;
+        }
+
+
+        hr {
+            border: 2px solid rgba(216, 210, 185, 1);
+        }
+
+        .accordion {
+            margin-top: 2rem;
+        }
+
+        .accordion-item {
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .accordion-button {
+            background-color: #ffffffff;
+            color: #000000ff;
+            font-weight: bold;
+            padding: 1.25rem 1.5rem;
+            border: none;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: white;
+            color: black;
+            box-shadow: none;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: transparent;
+        }
+
+        .accordion-body {
+            padding: 0;
+            background: white;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background-color: #fffacd;
+            color: black;
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-color: #e9ecef;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .table tbody tr:hover {
+            background-color: #fffacd;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Top Navigation Bar [ Minesweeper Title, User Profile Button ]-->
     <nav class="navbar navbar-expand-lg px-3">
         <div class="container-fluid">
             <a class="navbar-parent">Minesweeper</a>
@@ -37,151 +266,132 @@ $game_history = getGameHistory($user_id);
                     alt="Profile Picture" id="pfp" class="rounded-circle me-2" width="40" height="40">
 
                 <div class="profile-dropdown">
-                    <!-- Dropdown toggle button (always shows username) -->
-                    <button class="btn dropdown-toggle" type="button" id="userDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        defaultUser
+                    <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <?php echo htmlspecialchars($userStats['username']); ?>
                     </button>
 
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="profile.html">Profile</a></li>
-                        <li> <hr class="dropdown-divider"> </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li><a class="dropdown-item" href="login_page.html">Logout</a></li>
                     </ul>
                 </div>
             </div>
         </div>
-    <!-- </nav>
-        <nav class="nav flex-column">
+    </nav>
+
+    <nav class="nav flex-column">
         <ul class="vertical-nav">
             <a class="nav-link" href="home.html">Home</a>
             <a class="nav-link" href="leaderboard.html">Leaderboard</a>
-             For tabs the user doesn't have access to, while logged out, do we want to hide 
+            <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
             or disable them? -->
             <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Shop</a>
         </ul>
-    </nav> 
-    
-    <div class=usernameDisplay id=usernameDisplay>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
-            alt="Profile Picture" id="pfp" class="rounded-circle me-2" width="40" height="40">
-        <span id="username"> <?php if($user_stats != null) echo ($user_stats['username']); ?></span>
-        <button type="button" class="btn btn-light">Edit</button>
-    </div>
+    </nav>
 
-    <!-- User Stats Display -->
-    <div class=statsDisplay id=statsDisplay>
-        <div class=statsTopRow>
-            <span id=rank>
-
-            </span>
-            <!-- will change this to be high score instead, messed up my SQL but want to make sure we still pulling -->
-            <span id=highestScore>Total Score: <?php if($user_stats != null) echo ($user_stats['totalScore']); ?></span>
+    <div class="container mt-4" id="name&stats">
+        <div class = user-and-pfp>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
+                        alt="Profile Picture" id="bigPfp" class="rounded-circle me-2" width="60" height="60"> 
+            <h1>Hello, <?php echo htmlspecialchars($userStats['username']); ?></h1>
         </div>
-        <div class=statsBottomRow>
-            <span id=gamesPlayed>Games Played: 
-                <?php echo intval($games_played['games_played'] ?? 0); ?>
-        </span>
-        <span id=fastestTime>Fastest Time:
-            <?php echo intval($games_played['fastest_time'] ?? 0); ?>
-        </span>
-    </div>
-    
-    </div>
+        <hr>
+        <div class="stats-container">
+            <p>Total Score: <span class="stat-box"> Not Implemented Yet </span></p>
+            <p>Total Score: <span class="stat-box"><?php echo $userStats['totalScore']; ?></span></p>
+            <p>Games Played: <span class="stat-box"><?php echo $gamesPlayed['games_played']; ?></span></p>
+            <p>Fastest Time: <span class="stat-box"><?php echo $gamesPlayed['fastest_time'] ?? 'N/A'; ?></span></p>
+        </div>
 
-    <!-- Accordion for Game History-->
-    <div id="content_list_container">
-        <h3>Items list</h3>
-        <div class="accordion accordion-flush" id="content_accordion">
+        <!-- Accordion Section -->
+        <div class="accordion mt-4" id="dashboardAccordion">
+
+            <!-- Game History Accordion Item -->
             <div class="accordion-item">
-                <h2 class="accordion-header" id="game-history">
-                    <div class="accordion-button collapsed d-flex" data-bs-toggle="collapse" data-bs-target="#item_1"
-                        aria-expanded="false" aria-controls="#item_1">
-                        <h5 class="content_title fw-bold">Game History</h5>
-                    </div>
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseGameHistory" aria-expanded="false" aria-controls="collapseGameHistory">
+                        Game History
+                    </button>
                 </h2>
-                    <div id="item_1" class="accordion-collapse collapse" aria-labelledby="flush-heading-1"
-                        data-bs-parent="#content_accordion">
-                        <div class="accordion-body game-history-items">
-                            <?php if (!empty($game_history)): ?>
-                                <ul>
-                                    <?php foreach ($game_history as $game): ?>
-                                        <ul class = game-items>
-                                            <?= htmlspecialchars($game['gameId']) ?>
-                                            <div class="ms-auto">
-                                                <span class="edit-icon" data-app-id="1" data-content-id="1"
-                                                    aria-hidden="true"><button type ="button" class ="btn btn-success"> ↻ </button></span>
-                                                <span class="delete-icon" data-app-id="1" data-content-id="1"
-                                                    aria-hidden="true"><button type ="button" class ="btn btn-danger"> X </button></span>
-                                            </div>
-                                        </ul>
-                                    <?php endforeach; ?>
-                                </ul>
-                                    <!-- add buttons for add and delete here -->
-                            <?php else: ?>
-                                <p>No games found.</p>
-                            <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="friend-list">
-                    <div class="accordion-button collapsed d-flex" data-bs-toggle="collapse" data-bs-target="#item_2"
-                        aria-expanded="false" aria-controls="item_2">
-                        <h5 class="content_title fw-bold">Friends List</h5>
-                    </div>
-                </h2>
-                    <div id="item_2" class="accordion-collapse collapse" aria-labelledby="flush-heading-2"
-                        data-bs-parent="#content_accordion">
-                        <div class="accordion-body content_text">
-                            <!-- Friends List -->
-                        <?php if (!empty($friends_list)): ?>
-                            <ul>
-                                <?php foreach ($friends_list as $friend): ?>
-                                    <li>
-                                        <?= htmlspecialchars($friend['friend_username']) ?>
-                                        <div class="ms-auto">
-                                            <span class="delete-icon" data-app-id="1" data-content-id="1"
-                                                aria-hidden="true"><button type ="button" class ="btn btn-danger"> X </button></span>
-                                        </div>
-                                    </li>
+                <div id="collapseGameHistory" class="accordion-collapse collapse" data-bs-parent="#dashboardAccordion">
+                    <div class="accordion-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Game ID</th>
+                                    <th>Score</th>
+                                    <th>Time</th>
+                                    <th>Delete?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($gameHistory as $game): ?>
+                                    <tr>
+                                        <td><?php echo $game['gameId']; ?></td>
+                                        <td><?php echo $game['score']; ?></td>
+                                        <td><?php echo $game['gameTime']; ?></td>
+                                        <td>
+                                            <form method="post">
+                                                <input type="hidden" name="game_id" value="<?php echo $game['gameId']; ?>">
+                                                <input type="submit" name="deleteGameBtn" class="btn btn-danger btn-sm"
+                                                    value="Delete">
+                                            </form>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
-                            </ul>
-                                <!-- add buttons for add and delete here -->
-                        <?php else: ?>
-                            <p>No friends found.</p>
-                        <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+
+            <!-- Friends List Accordion Item -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFriendsList" aria-expanded="false" aria-controls="collapseFriendsList">
+                        Your Friends
+                    </button>
+                </h2>
+                <div id="collapseFriendsList" class="accordion-collapse collapse" data-bs-parent="#dashboardAccordion">
+                    <div class="accordion-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Friend Username</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($userFriends as $friend): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($friend['friend_username']); ?></td>
+                                        <td>
+                                            <form method="post">
+                                                <input type="hidden" name="friend_id"
+                                                    value="<?php echo $friend['friend_id']; ?>">
+                                                <input type="submit" name="deleteFriendBtn" class="btn btn-danger btn-sm"
+                                                    value="Remove Friend">
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
+        <!-- End Accordion Section -->
+
     </div>
-
-                
-
-
-
-    <script>
-        const editBtns = document.querySelectorAll(".edit-icon");
-        const deleteBtns = document.querySelectorAll(".delete-icon");
-
-        editBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                console.log(btn.dataset.contentId);
-            })
-        })
-
-        deleteBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                console.log(btn.dataset.contentId);
-            })
-        })
-    </script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" 
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
