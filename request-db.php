@@ -189,4 +189,108 @@ function timeFiltering($entries, $timeMax){
     return $entries;
 }
 
+// ---------------------- PROFILE FUNCTIONS ---------------------- //
+
+function getUserStats($user_id) {
+    global $db;
+
+    $query = "SELECT username, totalScore 
+              FROM profile
+              WHERE userId = :userId";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userId', $user_id);
+    $statement->execute();
+    $results = $statement->fetch();
+    $statement->closeCursor();
+    return $results;
+}
+
+
+function getGamesPlayed($user_id) {
+    global $db;
+
+    $query = "SELECT COUNT(*) AS games_played, 
+                     MIN(gameTime) AS fastest_time 
+              FROM game
+              WHERE userId = :userId";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userId', $user_id);
+    $statement->execute();
+    $results = $statement->fetch();
+    $statement->closeCursor();
+    return $results;
+}
+
+function getGameHistory($user_id) {
+    global $db;
+
+    $query = "SELECT *
+              FROM game
+              WHERE userId = :userId";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userId', $user_id);
+    $statement->execute();
+    $results = $statement->fetchAll();
+    $statement->closeCursor();
+    return $results;
+}
+
+function getUserFriends($user_id) {
+    global $db;
+
+    $query = "
+        SELECT p.userId AS friend_id, p.username AS friend_username
+        FROM friends f
+        JOIN profile p ON p.userId = f.userIdTwo
+        WHERE f.userIdOne = :userId
+
+        UNION
+
+        SELECT p.userId AS friend_id, p.username AS friend_username
+        FROM friends f
+        JOIN profile p ON p.userId = f.userIdOne
+        WHERE f.userIdTwo = :userId
+        ";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userId', $user_id);
+    $statement->execute();
+    $results = $statement->fetchAll();
+    $statement->closeCursor();
+
+    return $results;
+}
+
+function deleteFriend($session_id, $user_id) {
+    global $db;
+
+    $query = "DELETE FROM friends
+              WHERE (userIdOne = :session_id AND userIdTwo = :user_id)
+                 OR (userIdOne = :user_id AND userIdTwo = :session_id)";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':session_id', $session_id);
+    $statement->bindValue(':user_id', $user_id);
+    $success = $statement->execute();
+    $statement->closeCursor();
+
+    return $success;
+}
+
+function deleteGame($game_id) {
+    global $db;
+
+    $query = "DELETE FROM game
+              WHERE gameId = :game_id";
+
+    $statement = $db->prepare($query);
+    $statement->bindValue(':game_id', $game_id);
+    $success = $statement->execute();
+    $statement->closeCursor();
+
+    return $success;
+}
 ?>

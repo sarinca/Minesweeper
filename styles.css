@@ -1,11 +1,29 @@
+/* ---------------------------------------- */
+/*                                          */
+/*               INDEX.HTML                 */
+/*                                          */
+/* ---------------------------------------- */
+
 /* ========== Horizontal Nav Bar ========== */
 body {
+    margin: 0;
+    padding: 0;
     background-color: rgba(252, 245, 217);
     color: #000;
     font-family: system-ui, sans-serif;
 }
 
 .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+
     background-color: rgba(252, 245, 217);
     border-bottom: 8px solid rgb(243, 236, 210);
 }
@@ -62,20 +80,26 @@ div.warning-text {
 
 /* ========== Sidebar Styles ========== */
 .vertical-nav {
-    background-color: rgba(252, 245, 217);
+    position: fixed;
+    top: 70px;
+    left: 0px;
     width: 200px;
+    background-color: rgba(252, 245, 217);
+    height: calc(100vh - 70px);
     display: flex;
     flex-direction: column;
     border-right: 8px solid rgb(243, 236, 210);
     box-sizing: border-box;
     background-color: rgba(252, 245, 217);
     padding-top: 10px;
+    box-sizing: border-box;
 }
 
 
 .nav-link {
+    padding: 15px 20px;
     background-color: rgba(252, 245, 217);
-    display: flex;
+    display: block;
     align-items: center;
     padding: 0 25px;
     height: 60px;
