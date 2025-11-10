@@ -2,6 +2,10 @@
 require('connect-db.php');         // include() 
 require('request-db.php');
 
+echo $_SESSION["username"];
+echo " ";
+echo $_SESSION["email"];
+
 $shop_items = getShopItems();   //get all rows in the table
 $user_points = 95;        //THIS IS A DEFAULT VALUE, NEED TO CHANGE LATER W/DB REQ
 ?>
