@@ -2,6 +2,7 @@
 require('connect-db.php');         // include() 
 require('request-db.php');
 
+session_start();
 echo $_SESSION["username"];
 echo " ";
 echo $_SESSION["email"];
