@@ -111,7 +111,7 @@ function login($username) {
 function getShopItems(){
     global $db;
 
-    $query = "SELECT name, description, price FROM itemInventory NATURAL JOIN itemDetails";
+    $query = "SELECT name, description, price, picPath FROM itemInventory NATURAL JOIN itemDetails";
     $statement = $db->prepare($query);
     $statement->execute();
     $results = $statement->fetchAll();
@@ -119,7 +119,55 @@ function getShopItems(){
     return $results;
 }
 
+function getUserPoints($currUsername){
+    //get the points tied with the current user from the profile table
 
+    global $db;
+
+    $query = "SELECT points FROM profile WHERE username = :currUsername";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':currUsername', $currUsername);
+    $statement->execute();
+    $results = $statement->fetch();
+    $statement->closeCursor();
+    return $results;
+}
+
+function addPointsForTesting($currUsername){
+    //find the user's current points, then add 100
+    global $db;
+
+    $query = "UPDATE profile SET points = (points + 100) WHERE username = :currUsername";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':currUsername', $currUsername);
+    $statement->execute();
+    // $results = $statement->fetch();
+    $statement->closeCursor();
+    // return $results;
+    return;
+}
+
+function handlePurchase($currUsername, $itemName, $itemPrice){
+    global $db;
+
+    // step 1: update the user table to subtract the amount of points they have
+    $query = "UPDATE profile SET points = (points - :itemPrice) WHERE username = :currUsername";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':currUsername', $currUsername);
+    $statement->bindValue(':itemPrice', $itemPrice);
+    $statement->execute();
+    $statement->closeCursor();
+
+    //step 2: update the buys table with the item id 
+    $query = "INSERT INTO buys (userId, itemId) 
+        SELECT (SELECT userId FROM profile WHERE username = :currUsername), 
+        (SELECT itemId FROM itemInventory WHERE name = :itemName)";
+        $statement = $db->prepare($query);
+    $statement->bindValue(':currUsername', $currUsername);
+    $statement->bindValue(':itemName', $itemName);
+    $statement->execute();
+    $statement->closeCursor();
+}
 
 // -------------------- LEADERBOARD FUNCTIONS -------------------- //
 

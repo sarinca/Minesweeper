@@ -8,7 +8,7 @@ echo " ";
 echo $_SESSION["email"];
 
 $shop_items = getShopItems();   //get all rows in the table
-$user_points = 95;        //THIS IS A DEFAULT VALUE, NEED TO CHANGE LATER W/DB REQ
+$user_points = getUserPoints($_SESSION["username"])[0];
 ?>
 
 
@@ -17,16 +17,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
    if (!empty($_POST['buyBtn']))
    {
-    //idea here: filter the entries accordingly
-    echo "Bought ". $_POST['name'] . " for: " . $_POST['price'] . " points";
 
-    //UPDATE THE USER POINTS IN DB
-    //ADD THIS ITEM TO THE USER's ACCOUNT IN DB
+    //CHECK IF THIS IS A VALID PURCHASE
+    if ($user_points >= $_POST['price']){
 
-    $user_points -= $_POST['price'];
+        //TO-DO: turn this into a temporary success pop-up with information
+        echo "Bought ". $_POST['name'] . " for: " . $_POST['price'] . " points";
+
+        //this updates the user points AND adds the item to the user's account 
+        handlePurchase($_SESSION["username"], $_POST['name'], $_POST['price']);
+        $user_points = $user_points - $_POST['price'];
+    } else {
+        echo "ERROR: You don't have enough points for this item, sorry";
+    }
 
     //RERENDER THE BUTTONS AND TEXT
-   } 
+   }  
+   if (!empty($_POST['extraPointsBtn'])){
+    //this is the shortcut for testing 
+    addPointsForTesting($_SESSION["username"]);
+    $user_points = $user_points + 100;
+
+   }
 }
 ?>
 
@@ -113,8 +125,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
                         if ($user_points < $item['price']) { $buttonText = "not enough points"; $buttonClass = $buttonClass . " disabled";}?>
                         <div style="width:30%; text-align: center;">
                             <div class="shop-card" id= <?php echo $itemId ?> name=<?php echo $itemId ?>>
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
-                        alt="Profile Picture" class="rounded-circle mb-4" width="100" height="100">
+                                <img src= <?php echo $item['picPath'] ?> 
+                                    alt="Item Picture" class="rounded-circle mb-4" width="100" height="100">
                                 <div> <?php echo $item['description'] ?> </div>
                                 <div class="warning-text">{valid for one use only}</div>
                             </div>
@@ -127,7 +139,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
                         </div>
 
                     <?php endforeach; ?>
-                </div>              
+                </div>    
+                <form method="post" action="shop.php">
+                    <input type="submit" name="extraPointsBtn" class="btn btn-primary" value="Shh.. add 100 points to account"></input>
+                </form>  
         </div>
     </div>
 
