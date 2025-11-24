@@ -134,6 +134,22 @@ function getTopPointUsers(){
     return $results;
 }
 
+function getTopPointFriends($currUserId){
+    global $db;
+
+    $query = "SELECT username, totalScore FROM profile WHERE userId in 
+    (SELECT (userIdOne + userIdTwo - :currUserId) AS userId 
+            FROM friends
+            WHERE userIdOne = :currUserId OR userIdTwo = :currUserId) 
+    ORDER BY totalScore DESC";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':currUserId', $currUserId);
+    $statement->execute();
+    $results = $statement->fetchAll();
+    $statement->closeCursor();
+    return $results;
+}
+
 function getEntriesByMode($mode)  
 {
     global $db; 
@@ -152,33 +168,71 @@ function getEntriesByMode($mode)
     return $results;
 }
 
-function processFiltering($gameMode, $userFriends){
+function getUserIdFromUsername($currUsername) {
+    global $db; 
+
+    $query = "SELECT userId FROM profile WHERE username = :currUsername";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':currUsername', $currUsername);  //this minimizes security risk
+
+    $statement->execute();
+    $result = $statement->fetch(); 
+    $statement->closeCursor();
+
+    return $result;
+}
+
+function getEntriesByFriendAndMode($mode, $currUserId) {
+    global $db; 
+
+    $query = "WITH MyFriends AS (SELECT (userIdOne + userIdTwo - :currUserId) AS userId 
+            FROM friends
+            WHERE userIdOne = :currUserId OR userIdTwo = :currUserId)
+
+            SELECT lead.gameId as gameId, game.gameTime as gameTime, profile.username as username, game.mode as mode
+            FROM leaderboardEntry AS lead NATURAL JOIN game NATURAL JOIN profile NATURAL JOIN MyFriends
+            WHERE mode = :mode
+            ORDER BY gameTime ASC";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':mode', $mode);  //this minimizes security risk
+    $statement->bindValue(':currUserId', $currUserId);
+    $statement->execute();
+    $results = $statement->fetchAll(); 
+    $statement->closeCursor();
+
+    return $results;
+}
+
+function processFiltering($gameMode, $userFriends, $currUsername){
     global $db;
+
+    $currUserId = getUserIdFromUsername($currUsername);
+    $currUserId = $currUserId[0];
 
     $display_entries = [];
 
     //step 1: filter based on game mode OR all-time
     if ($gameMode == 'Easy' || $gameMode == 'Medium' || $gameMode == 'Hard'){
-        $display_entries = getEntriesByMode($gameMode);
-        //also filter by time here
+        
+        if ($userFriends == 'friends'){
+            return getEntriesByFriendAndMode($gameMode, $currUserId);
+        } else {
+            return getEntriesByMode($gameMode);
+        }
+
     } else {
-        $display_entries = getTopPointUsers();
+
+        if ($userFriends == 'friends'){
+            return getTopPointFriends($currUserId);
+        } else {
+            return getTopPointUsers();
+        }
+
     }
-
-    //return $display_entries;
-
-    // //step 2: with display_entries as a param, filter based on user friends - IMPLEMENT THIS LATER
-    // if ($userFriends == 'friends'){
-    //     //filter by friends only with the current user
-    //     //TODO: WRITE THIS FUNCTION LATER - need to add a param to this function to capture the user id
-    // }
-
-    return $display_entries;
-    // }
 }
 
 function timeFiltering($entries, $timeMax){
-    echo "time max: " . $timeMax;
+    // echo "time max: " . $timeMax;
     // //step 3: with display_entries as a param, filter based on time range IF a game mode is selected (not all-time)
     if ($timeMax != 0 && $timeMax !== null) {
         // Filter game entries by completion date

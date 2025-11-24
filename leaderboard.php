@@ -2,6 +2,11 @@
 require('connect-db.php');         // include() 
 require('request-db.php');
 
+session_start();
+echo $_SESSION["username"];
+echo " ";
+echo $_SESSION["email"];
+
 $leaderboard_entries = getTopPointUsers();   //get all rows in the table
 $slider_range = null;
 $default_slider_value = "50";
@@ -68,13 +73,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     // echo "Friend users selected: " . $_POST['friendSelect'];
     // echo "Max time selected: " . $selected_time;
 
+    $curr_username = $_SESSION["username"];
     //if mode changed, then update slider range
    if ($_POST['modeSelect'] != "allPoints") {
-        $leaderboard_entries = processFiltering($selected_mode, $selected_users);
+        $leaderboard_entries = processFiltering($selected_mode, $selected_users, $curr_username);
         // echo "SLIDER VAL CAPTURED: " . $_POST['myRange'];
         $leaderboard_entries = timeFiltering($leaderboard_entries, $selected_time);
     } else {
-        $leaderboard_entries = processFiltering($selected_mode, $selected_users);
+        $leaderboard_entries = processFiltering($selected_mode, $selected_users, $curr_username);
     }
 
     //added to make the slider
@@ -135,6 +141,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
             --bs-btn-hover-border-color: #ffffff;
             --bs-btn-border-radius: 14px;
                 --bs-btn-active-bg: #ffffff;
+        }
+        .navbar {
+            position: relative !important;
+        }
+        .vertical-nav {
+            position: relative !important;
+            top: 0px !important;
         }
     </style>
 </head>

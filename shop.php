@@ -57,6 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
             --bs-btn-disabled-border-color: #c9cfc9;
             --bs-btn-disabled-bg: #c9cfc9;
         }
+        .navbar {
+            position: relative !important;
+        }
+        .vertical-nav {
+            position: relative !important;
+            top: 0px !important;
+        }
     </style>
 </head>
 
