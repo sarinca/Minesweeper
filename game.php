@@ -92,6 +92,14 @@ echo "game.php loaded";
         </ul>
     </div>
 
+    <div id="board"></div>
+
+    <script>
+        const height = <?php echo $height; ?>;
+        const width = <?php echo $width; ?>;
+        const board = document.getElementById("board");
+    </script>
+
 
 </body>
 </html>
