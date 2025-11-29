@@ -413,7 +413,7 @@ function getGamemodeInfo($mode){
     return $results;
 }
 
-function addNewGame($gameInfo){
+function addNewGame($currUsername, $gameInfo){
     echo "Adding new game...";
     global $db;
 
@@ -436,7 +436,7 @@ function addNewGame($gameInfo){
     $state_boxesClicked = implode("", $boxesClicked);
     $state_bombPlacement = implode("", $bombPlacement);
 
-    $userId = 1; //$_SESSION['userId'];
+    $userId = $currUsername; // currently doesnt work but i think thats bc defaultUser doesnt have an actual userId?
 
     $gameTime = 0;
     echo "querying...";

@@ -1,6 +1,12 @@
 <?php
 require('connect-db.php');    
 require('request-db.php');
+
+session_start();
+echo $_SESSION["username"];
+echo " ";
+echo $_SESSION["email"];
+
 $mode = null;
 $gamemodeInfo = null;
 
@@ -11,15 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     if (!empty($_POST['easyBtn'])){
         $mode = "Easy";
         $gamemodeInfo = getGamemodeInfo($mode);
-        addNewGame($gamemodeInfo);
+        addNewGame($_SESSION["username"], $gamemodeInfo);
     } else if (!empty($_POST['mediumBtn'])) {
         $mode = "Medium";
         $gamemodeInfo = getGamemodeInfo($mode);
-        addNewGame($gamemodeInfo);
+        addNewGame($_SESSION["username"], $gamemodeInfo);
     } else if (!empty($_POST['hardBtn'])){
         $mode = "Hard";
         $gamemodeInfo = getGamemodeInfo($mode);
-        addNewGame($gamemodeInfo);
+        addNewGame($_SESSION["username"], $gamemodeInfo);
     }
 }
 ?>
