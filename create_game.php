@@ -48,6 +48,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
 
+    <style>
+        .navbar {
+            position: relative !important;
+        }
+        .vertical-nav {
+            position: relative !important;
+            top: 0px !important;
+        }
+    </style>
+
 <body>
      <!-- Top Navigation Bar [ Minesweeper Title, User Profile Button ]-->
     <nav class="navbar navbar-expand-lg px-3">
@@ -80,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
             <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
             or disable them? -->
-            <a class="nav-link disabled" href="shop.html" tabindex="-1" aria-disabled="true">Shop</a>
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Shop</a>
         </ul>
         <div class="m-5" style="width:68%;"> 
             <h2 class="mb-5"> Create New Game </h2>

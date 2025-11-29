@@ -32,6 +32,29 @@ echo "game.php loaded";
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
 
+    <style>
+        #board {
+            display: grid;
+            grid-template-columns: repeat(<?php echo $width; ?>, 30px);
+            grid-template-rows: repeat(<?php echo $height; ?>, 30px);
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #ccc;
+            border: 1px solid #999;
+            cursor: pointer;
+        }
+        .navbar {
+            position: relative !important;
+        }
+        .vertical-nav {
+            position: relative !important;
+            top: 0px !important;
+        }
+    </style>
+
+
 
 <body>
      <!-- Top Navigation Bar [ Minesweeper Title, User Profile Button ]-->
@@ -65,7 +88,7 @@ echo "game.php loaded";
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
             <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
             or disable them? -->
-            <a class="nav-link disabled" href="shop.html" tabindex="-1" aria-disabled="true">Shop</a>
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Shop</a>
         </ul>
     </div>
 
