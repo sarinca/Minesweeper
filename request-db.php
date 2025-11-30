@@ -317,10 +317,12 @@ function getUserStats($user_id) {
 function getGamesPlayed($user_id) {
     global $db;
 
-    $query = "SELECT COUNT(*) AS games_played, 
-                     MIN(gameTime) AS fastest_time 
-              FROM game
-              WHERE userId = :userId";
+    $query = "SELECT 
+                COUNT(*) AS games_played, 
+                MIN(CASE WHEN s.state_status = 'WIN' THEN g.gameTime ELSE NULL END) AS fastest_time 
+              FROM game g
+              LEFT JOIN state s ON g.gameId = s.gameId
+              WHERE g.userId = :userId";
 
     $statement = $db->prepare($query);
     $statement->bindValue(':userId', $user_id);

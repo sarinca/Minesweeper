@@ -589,8 +589,18 @@ $userFriends = getUserFriends($user_id);
             <p class="stat-label">Total Score: <span class="stat-box"><?php echo $userStats['totalScore']; ?></span></p>
             <p class="stat-label">Games Played: <span
                     class="stat-box"><?php echo $gamesPlayed['games_played']; ?></span></p>
-            <p class="stat-label">Fastest Time: <span
-                    class="stat-box"><?php echo $gamesPlayed['fastest_time'] ?? 'N/A'; ?></span></p>
+            <p class="stat-label">Fastest Time: <span class="stat-box">
+                    <?php
+                    if (!empty($gamesPlayed['fastest_time'])) {
+                        $seconds = $gamesPlayed['fastest_time'];
+                        $minutes = floor($seconds / 60);
+                        $secs = $seconds % 60;
+                        echo sprintf('%02d:%02d', $minutes, $secs);
+                    } else {
+                        echo 'N/A';
+                    }
+                    ?>
+                </span></p>
         </div>
 
         <!-- Accordion Section -->
@@ -612,7 +622,7 @@ $userFriends = getUserFriends($user_id);
                                     <th>Game ID</th>
                                     <th>Mode</th>
                                     <th>Status</th>
-                                    <th>Time (sec)</th>
+                                    <th>Time</th>
                                     <th>Score</th>
                                     <th>Delete?</th>
                                 </tr>
@@ -623,7 +633,18 @@ $userFriends = getUserFriends($user_id);
                                         <td><?php echo $game['gameId'] ?? 'N/A'; ?></td>
                                         <td><?php echo $game['mode'] ?? 'N/A'; ?></td>
                                         <td><?php echo $game['state_status'] ?? 'N/A'; ?></td>
-                                        <td><?php echo $game['gameTime'] ?? 'N/A'; ?></td>
+                                        <td>
+                                            <?php
+                                            if (!empty($game['gameTime'])) {
+                                                $seconds = $game['gameTime'];
+                                                $minutes = floor($seconds / 60);
+                                                $secs = $seconds % 60;
+                                                echo sprintf('%02d:%02d', $minutes, $secs);
+                                            } else {
+                                                echo 'N/A';
+                                            }
+                                            ?>
+                                        </td>
                                         <td><?php echo $game['score'] ?? 'N/A'; ?></td>
                                         <td>
                                             <form method="post">
