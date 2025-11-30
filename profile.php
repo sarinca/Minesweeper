@@ -1,15 +1,35 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 require_once('connect-db.php');
 require_once('request-db.php');
 
 $user_id = 1;
 
+$debug_messages = [];
+$debug_messages[] = "Page loaded at: " . date('H:i:s');
+$debug_messages[] = "User ID: $user_id";
+$debug_messages[] = "Request Method: " . $_SERVER['REQUEST_METHOD'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $debug_messages[] = "POST received!";
+    $debug_messages[] = "POST data: " . json_encode($_POST);
     if (!empty($_POST['deleteFriendBtn'])) {
         deleteFriend($user_id, $_POST['friend_id']);
     } elseif (!empty($_POST['deleteGameBtn'])) {
         deleteGame($_POST['game_id']);
+    } elseif (isset($_POST['updateProfileBtn'])) {
+        $debug_messages[] = "Update profile button clicked!";
+        $debug_messages[] = "Username: " . ($_POST['username'] ?? 'EMPTY');
+        $debug_messages[] = "PFP URL: " . ($_POST['pfp_url'] ?? 'EMPTY');
+        
+        updateProfile($user_id, $_POST);
+        $debug_messages[] = "updateProfile() called";
+        
+        $debug_messages[] = "About to redirect...";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
     }
 }
 
@@ -29,12 +49,14 @@ $userFriends = getUserFriends($user_id);
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
+
         body {
             margin: 0;
             padding: 0;
             background-color: rgba(252, 245, 217);
             color: #000;
-            font-family: system-ui, sans-serif;
+            font-family: 'Inder', sans-serif;
         }
 
         .navbar {
@@ -52,7 +74,7 @@ $userFriends = getUserFriends($user_id);
         }
 
         .navbar-parent {
-            font-family: system-ui, sans-serif;
+            font-family: 'Inder', sans-serif;
             font-style: normal;
             text-decoration: none;
             color: #000;
@@ -105,8 +127,7 @@ $userFriends = getUserFriends($user_id);
             margin-left: 220px;
             margin-top: 150px;
             padding: 2rem;
-            max-width: 750px;
-            
+            max-width: 80%
         }
 
         #name\&stats {
@@ -144,7 +165,8 @@ $userFriends = getUserFriends($user_id);
 
         .stats-container {
             padding: 15px;
-            max-width: 750px;
+            padding-left: 100px;
+            max-width: 100%;
             color: #000000ff;
             font-weight: bold;
             background-color: #f9c74f;
@@ -157,17 +179,18 @@ $userFriends = getUserFriends($user_id);
 
         .stat-box {
             padding: 15px;
-            width: fit-content;;
+            width: fit-content;
+            ;
             display: flex;
             flex-direction: column;
             background-color: #fbe9af;
-            color: #000000ff; 
-            border-radius: 5px; 
+            color: #000000ff;
+            border-radius: 5px;
             padding: 4px 8px;
-            margin-left: 6px; 
-            font-weight: bold;
+            margin-left: 6px;
             min-width: 40px;
             text-align: center;
+            font-weight: 300px;
         }
 
         .stats-container p {
@@ -175,11 +198,18 @@ $userFriends = getUserFriends($user_id);
             align-items: center;
             margin: 0;
             padding: 0.5rem;
+            gap: 30px;
+        }
+
+        .stat-label {
+            font-size: 24px;
+            font-weight: bold;
         }
 
 
         hr {
             border: 2px solid rgba(216, 210, 185, 1);
+            width: 100%;
         }
 
         .accordion {
@@ -219,10 +249,11 @@ $userFriends = getUserFriends($user_id);
 
         .table {
             margin-bottom: 0;
+            border-style: none;
         }
 
         .table th {
-            background-color: #fffacd;
+            background-color: #ffffffff;
             color: black;
             border: none;
             padding: 1rem;
@@ -262,8 +293,10 @@ $userFriends = getUserFriends($user_id);
         <div class="container-fluid">
             <a class="navbar-parent">Minesweeper</a>
             <div class="d-flex align-items-center">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
-                    alt="Profile Picture" id="pfp" class="rounded-circle me-2" width="40" height="40">
+                <img src="<?php echo !empty($userStats['profilePicture_path'])
+                    ? $userStats['profilePicture_path']
+                    : '/images/profiles/default.png'; ?>" id="pfp" class="rounded-circle me-2" width="40" height="40">
+
 
                 <div class="profile-dropdown">
                     <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown"
@@ -287,24 +320,71 @@ $userFriends = getUserFriends($user_id);
         <ul class="vertical-nav">
             <a class="nav-link" href="home.html">Home</a>
             <a class="nav-link" href="leaderboard.html">Leaderboard</a>
-            <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
-            or disable them? -->
             <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Shop</a>
         </ul>
     </nav>
 
     <div class="container mt-4" id="name&stats">
-        <div class = user-and-pfp>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
-                        alt="Profile Picture" id="bigPfp" class="rounded-circle me-2" width="60" height="60"> 
+        <div class=user-and-pfp>
+            <img src="<?php echo !empty($userStats['profilePicture_path'])
+                ? $userStats['profilePicture_path']
+                : '/images/profiles/default.png'; ?>" alt="Profile Picture" id="bigPfp" class="rounded-circle me-2"
+                width="60" height="60">
+
             <h1>Hello, <?php echo htmlspecialchars($userStats['username']); ?></h1>
+            <!-- Button to Edit PFP & Username -->
+            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                Edit
+            </button>
         </div>
+        <!-- Edit Profile Modal -->
+        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProfileLabel">Edit Profile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form method="POST" action="">
+                        <div class="modal-body">
+
+                            <!-- Username -->
+                            <div class="mb-3">
+                                <label for="usernameInput" class="form-label">New Username</label>
+                                <input type="text" class="form-control" id="usernameInput" name="username"
+                                    autocomplete="username" required>
+                            </div>
+
+                            <!-- Profile Picture URL -->
+                            <div class="mb-3">
+                                <label for="pfpUrlInput" class="form-label">Profile Picture URL</label>
+                                <input type="url" class="form-control" id="pfpUrlInput" name="pfp_url"
+                                    placeholder="https://example.com/image.png" autocomplete="url">
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" name="updateProfileBtn" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
         <hr>
         <div class="stats-container">
-            <p>Total Score: <span class="stat-box"> Not Implemented Yet </span></p>
-            <p>Total Score: <span class="stat-box"><?php echo $userStats['totalScore']; ?></span></p>
-            <p>Games Played: <span class="stat-box"><?php echo $gamesPlayed['games_played']; ?></span></p>
-            <p>Fastest Time: <span class="stat-box"><?php echo $gamesPlayed['fastest_time'] ?? 'N/A'; ?></span></p>
+            <p class="stat-label">Total Score: <span class="stat-box"> Not Implemented Yet </span></p>
+            <p class="stat-label">Total Score: <span class="stat-box"><?php echo $userStats['totalScore']; ?></span></p>
+            <p class="stat-label">Games Played: <span
+                    class="stat-box"><?php echo $gamesPlayed['games_played']; ?></span></p>
+            <p class="stat-label">Fastest Time: <span
+                    class="stat-box"><?php echo $gamesPlayed['fastest_time'] ?? 'N/A'; ?></span></p>
         </div>
 
         <!-- Accordion Section -->
@@ -392,6 +472,13 @@ $userFriends = getUserFriends($user_id);
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        console.log("=== DEBUG START ===");
+        <?php foreach ($debug_messages as $msg): ?>
+        console.log(<?php echo json_encode($msg); ?>);
+        <?php endforeach; ?>
+        console.log("=== DEBUG END ===");
+    </script>
 </body>
 
 </html>

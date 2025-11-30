@@ -296,17 +296,22 @@ function timeFiltering($entries, $timeMax){
 function getUserStats($user_id) {
     global $db;
 
-    $query = "SELECT username, totalScore 
+    $query = "SELECT userId,
+                     username,
+                     points,
+                     totalScore,
+                     COALESCE(profilePicture_path, '') AS profilePicture_path
               FROM profile
               WHERE userId = :userId";
 
     $statement = $db->prepare($query);
     $statement->bindValue(':userId', $user_id);
     $statement->execute();
-    $results = $statement->fetch();
+    $results = $statement->fetch(PDO::FETCH_ASSOC);
     $statement->closeCursor();
     return $results;
 }
+
 
 
 function getGamesPlayed($user_id) {
@@ -395,4 +400,35 @@ function deleteGame($game_id) {
 
     return $success;
 }
+
+function updateProfile($user_id, $post) {
+    global $db;
+    
+    if (!empty($post['username'])) {
+        $query = "SELECT username FROM profile WHERE userId = :userId";
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':userId', $user_id);
+        $stmt->execute();
+        $currentUsername = $stmt->fetchColumn();
+        $stmt->closeCursor();
+        
+        // update user table (WE HAVE CASCADE TO UPDATE PROFILE TABLE)
+        $query = "UPDATE user SET username = :newUsername WHERE username = :currentUsername";
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':newUsername', $post['username']);
+        $stmt->bindValue(':currentUsername', $currentUsername);
+        $stmt->execute();
+        $stmt->closeCursor();
+    }
+    
+    if (!empty($post['pfp_url']) && filter_var($post['pfp_url'], FILTER_VALIDATE_URL)) {
+        $query = "UPDATE profile SET profilePicture_path = :path WHERE userId = :userId";
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':path', $post['pfp_url']);
+        $stmt->bindValue(':userId', $user_id);
+        $stmt->execute();
+        $stmt->closeCursor();
+    }
+}
+
 ?>
