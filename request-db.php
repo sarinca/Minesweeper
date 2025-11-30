@@ -431,4 +431,46 @@ function updateProfile($user_id, $post) {
     }
 }
 
+function searchUsers($user_id, $query) {
+    global $db;
+    
+    if (strlen($query) < 2) {
+        return [];
+    }
+    
+    // Search for users, excluding current user and existing friends
+    $sql = "SELECT p.userId, p.username 
+            FROM profile p
+            WHERE p.username LIKE :query
+            AND p.userId != :current_user
+            AND p.userId NOT IN (
+                SELECT userIdTwo FROM friends WHERE userIdOne = :current_user
+                UNION
+                SELECT userIdOne FROM friends WHERE userIdTwo = :current_user
+            )
+            LIMIT 10";
+    
+    $stmt = $db->prepare($sql);
+    $stmt->bindValue(':query', '%' . $query . '%');
+    $stmt->bindValue(':current_user', $user_id);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+    
+    return $results;
+}
+
+function addFriend($user_id, $friend_id) {
+    global $db;
+    
+    $query = "INSERT INTO friends (userIdOne, userIdTwo) VALUES (:user_id, :friend_id)";
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(':user_id', $user_id);
+    $stmt->bindValue(':friend_id', $friend_id);
+    $success = $stmt->execute();
+    $stmt->closeCursor();
+    
+    return $success;
+}
+
 ?>
