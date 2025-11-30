@@ -500,7 +500,8 @@ $userFriends = getUserFriends($user_id);
             <div class="d-flex align-items-center">
                 <img src="<?php echo !empty($userStats['profilePicture_path'])
                     ? $userStats['profilePicture_path']
-                    : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>" id="pfp" class="rounded-circle me-2" width="40" height="40">
+                    : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>" id="pfp"
+                    class="rounded-circle me-2" width="40" height="40">
 
                 <div class="profile-dropdown">
                     <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown"
@@ -532,8 +533,8 @@ $userFriends = getUserFriends($user_id);
         <div class=user-and-pfp>
             <img src="<?php echo !empty($userStats['profilePicture_path'])
                 ? $userStats['profilePicture_path']
-                : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>" alt="Profile Picture" id="bigPfp" class="rounded-circle me-2"
-                width="60" height="60">
+                : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>" alt="Profile Picture"
+                id="bigPfp" class="rounded-circle me-2" width="60" height="60">
 
             <h1>Hello, <?php echo htmlspecialchars($userStats['username']); ?></h1>
             <!-- Button to Edit PFP & Username -->
@@ -584,7 +585,7 @@ $userFriends = getUserFriends($user_id);
 
         <hr>
         <div class="stats-container">
-            <p class="stat-label">Total Score: <span class="stat-box"> Not Implemented Yet </span></p>
+            <p class="stat-label">Total Coins: <span class="stat-box"> Not Implemented Yet </span></p>
             <p class="stat-label">Total Score: <span class="stat-box"><?php echo $userStats['totalScore']; ?></span></p>
             <p class="stat-label">Games Played: <span
                     class="stat-box"><?php echo $gamesPlayed['games_played']; ?></span></p>
@@ -609,17 +610,21 @@ $userFriends = getUserFriends($user_id);
                             <thead>
                                 <tr>
                                     <th>Game ID</th>
+                                    <th>Mode</th>
+                                    <th>Status</th>
+                                    <th>Time (sec)</th>
                                     <th>Score</th>
-                                    <th>Time</th>
                                     <th>Delete?</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($gameHistory as $game): ?>
                                     <tr>
-                                        <td><?php echo $game['gameId']; ?></td>
-                                        <td><?php echo $game['score']; ?></td>
-                                        <td><?php echo $game['gameTime']; ?></td>
+                                        <td><?php echo $game['gameId'] ?? 'N/A'; ?></td>
+                                        <td><?php echo $game['mode'] ?? 'N/A'; ?></td>
+                                        <td><?php echo $game['state_status'] ?? 'N/A'; ?></td>
+                                        <td><?php echo $game['gameTime'] ?? 'N/A'; ?></td>
+                                        <td><?php echo $game['score'] ?? 'N/A'; ?></td>
                                         <td>
                                             <form method="post">
                                                 <input type="hidden" name="game_id" value="<?php echo $game['gameId']; ?>">

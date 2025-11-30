@@ -333,14 +333,25 @@ function getGamesPlayed($user_id) {
 function getGameHistory($user_id) {
     global $db;
 
-    $query = "SELECT *
-              FROM game
-              WHERE userId = :userId";
+    $query = "SELECT 
+                g.gameId,
+                g.gameTime,
+                g.mode,
+                s.state_status,
+                CASE 
+                    WHEN s.state_status = 'WIN' THEN gm.points
+                    ELSE 0
+                END AS score
+              FROM game g
+              LEFT JOIN state s ON g.gameId = s.gameId
+              LEFT JOIN gamemode gm ON g.mode = gm.mode
+              WHERE g.userId = :userId
+              ORDER BY g.gameId DESC";
 
     $statement = $db->prepare($query);
     $statement->bindValue(':userId', $user_id);
     $statement->execute();
-    $results = $statement->fetchAll();
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
     $statement->closeCursor();
     return $results;
 }
