@@ -38,11 +38,16 @@ require('connect-db.php');
 //        echo $e->getMessage();    // be careful, try to make it generic
 //     }
 // }
-// var_dump($_SERVER['REQUEST_METHOD'], $_POST['action']);
+var_dump($_SERVER['REQUEST_METHOD'], $_POST['action']);
 // detect action for updating game state w/o reloading page
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameState') {
     echo "updating game state...";
     updateGameState($_POST['gameId'], $_POST['game_state'], $_POST['state_status']);
+    exit();
+} 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updatePoints') {
+    echo "updating points...";
+    updatePoints($_POST['gameId'], $_POST['mode']);
     exit();
 }
 
@@ -556,6 +561,47 @@ function updateGameState($gameId, $game_state, $state_status){ //game_state is s
         $statement2 = $db->prepare($query2);
         $statement2->bindValue(':gameId', $gameId);
         $statement2->bindValue(':game_state', $game_state);
+        $statement2->execute();
+        $statement2->closeCursor();
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
+}
+
+function updatePoints($gameId, $mode){ 
+    global $db;
+
+    try {
+        // Fetch userId and gameTime from game table
+        $query1 = "SELECT userId FROM game WHERE gameId = :gameId";
+        $statement1 = $db->prepare($query1);
+        $statement1->bindValue(':gameId', $gameId);
+        $statement1->execute();
+        $gameData = $statement1->fetch();
+        $statement1->closeCursor();
+
+        $userId = $gameData['userId'];
+
+        // Calculate points based on mode and gameTime
+        $pointsEarned = 0;
+        if ($mode === 'Easy') {
+            $pointsEarned = 5;
+        } elseif ($mode === 'Medium') {
+            $pointsEarned = 30;
+        } elseif ($mode === 'Hard') {
+            $pointsEarned = 80;
+        }
+
+        // Update profile table with new points and totalScore
+        $query2 = "UPDATE profile SET points = points + :pointsEarned, totalScore = totalScore + :pointsEarned WHERE userId = :userId";
+        $statement2 = $db->prepare($query2);
+        $statement2->bindValue(':pointsEarned', $pointsEarned);
+        $statement2->bindValue(':userId', $userId);
         $statement2->execute();
         $statement2->closeCursor();
 

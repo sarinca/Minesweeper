@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
             <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
             or disable them? -->
-            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Shop</a>
+            <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>
         <div class="m-5" style="width:68%;"> 
             <h2 class="mb-5"> Create New Game </h2>

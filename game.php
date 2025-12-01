@@ -119,7 +119,7 @@ $width = $gamemodeInfo['width'];
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
             <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
             or disable them? -->
-            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Shop</a>
+            <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>
         <div id="game-area">
             <div id="board"></div>
@@ -223,7 +223,7 @@ $width = $gamemodeInfo['width'];
                         }
                         // alert("status = 4 " + state_status);
 
-                        updateDB(game_state, state_status); //   -- NOT YET IMPLEMENTED --
+                        updateDB(game_state, state_status, "<?php echo $mode; ?>"); 
                         return;
                     });
 
@@ -246,9 +246,9 @@ $width = $gamemodeInfo['width'];
 
                 });
 
-                function updateDB(game_state, state_status) {
+                function updateDB(game_state, state_status, mode) {
                     const game_state_str = game_state.join('');
-                    alert("Updating DB with state: " + game_state_str + " and status: " + state_status);
+                    // alert("Updating DB with state: " + game_state_str + " and status: " + state_status);
 
                     fetch('request-db.php', {
                         method: 'POST',
@@ -268,8 +268,26 @@ $width = $gamemodeInfo['width'];
                         alert('Error: ' + error);
                     });
 
-                    if (state_status === "WIN" || state_status === "LOSE") {
-                        // stop time and update db                              -- NEED TO IMPLEMENT
+                    if (state_status === "LOSE" ){
+
+                    } else if (state_status === "WIN") {
+                        // alert("Updating points for game " + gameId + " mode " + mode);
+                        fetch('request-db.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `action=${encodeURIComponent('updatePoints')}` +
+                                `&gameId=${encodeURIComponent(gameId)}` +
+                                `&mode=${encodeURIComponent(mode)}`
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            // alert('Points updated: ' + data);
+                        })
+                        .catch((error) => {
+                            alert('Error updating points: ' + error);
+                        });
                     } 
                 }
 
