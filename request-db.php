@@ -1,4 +1,5 @@
 <?php
+require('connect-db.php');
 // function addRequests($reqDate, $roomNumber, $reqBy, $repairDesc, $reqPriority)
 // {
 //     global $db; 
@@ -37,6 +38,13 @@
 //        echo $e->getMessage();    // be careful, try to make it generic
 //     }
 // }
+// var_dump($_SERVER['REQUEST_METHOD'], $_POST['action']);
+// detect action for updating game state w/o reloading page
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameState') {
+    echo "updating game state...";
+    updateGameState($_POST['gameId'], $_POST['game_state'], $_POST['state_status']);
+    exit();
+}
 
 // -------------------- REGISTER FUNCTIONS -------------------- //
 function check_registration($email, $username) {
@@ -436,7 +444,7 @@ function addNewGame($currUsername, $gameInfo){
     $state_boxesClicked = implode("", $boxesClicked);
     $state_bombPlacement = implode("", $bombPlacement);
 
-    $userId = $currUsername; // currently doesnt work but i think thats bc defaultUser doesnt have an actual userId?
+    $userId = 1;//$currUsername; // currently doesnt work but i think thats bc defaultUser doesnt have an actual userId?
 
     $gameTime = 0;
     echo "querying...";
@@ -511,6 +519,53 @@ function getGameInfo($gameId){
     $statement->closeCursor();
     
     return $results;
+}
+
+function getGameStateInfo($gameId){
+    global $db;
+
+    $query = "SELECT * FROM state WHERE gameId = :gameId";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':gameId', $gameId);
+    $statement->execute();
+    $results = $statement->fetch(); 
+    $statement->closeCursor();
+    
+    return $results;
+}
+
+function updateGameState($gameId, $game_state, $state_status){ //game_state is state_boxesClicked
+    global $db;
+    // echo "inside updating game state";
+    // var_dump($gameId, $game_state, $state_status);
+
+    try {
+        // echo "preparing query...";
+        $query1 = "UPDATE state SET state_boxesClicked = :game_state, state_status = :state_status WHERE gameId = :gameId";
+        // echo "query written...";
+        $statement1 = $db->prepare($query1);
+        // echo "binding values...";
+        $statement1->bindValue(':gameId', $gameId);
+        $statement1->bindValue(':game_state', $game_state);
+        $statement1->bindValue(':state_status', $state_status);
+        $statement1->execute();
+        // echo "Rows updated in state: " . $statement1->rowCount();
+        $statement1->closeCursor();
+
+        $query2 = "UPDATE game SET state_boxesClicked = :game_state WHERE gameId = :gameId";
+        $statement2 = $db->prepare($query2);
+        $statement2->bindValue(':gameId', $gameId);
+        $statement2->bindValue(':game_state', $game_state);
+        $statement2->execute();
+        $statement2->closeCursor();
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
 }
 
 function updateGameTime(){

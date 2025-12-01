@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                     <!-- Dropdown toggle button (always shows username) -->
                     <button class="btn dropdown-toggle" type="button" id="userDropdown"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        defaultUser
+                        <?php echo $_SESSION["username"]; ?>
                     </button>
 
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
