@@ -3,12 +3,26 @@ require('connect-db.php');         // include()
 require('request-db.php');
 
 session_start();
-echo $_SESSION["username"];
-echo " ";
-echo $_SESSION["email"];
+
+set_error_handler(function() { 
+    /* Intentionally ignore all errors during this block */ 
+
+});
+
+if ($_SESSION["username"] == NULL){
+    echo "Session not established yet";
+    $user_points = 999;
+} else {
+    echo $_SESSION["username"];
+    echo " ";
+    echo $_SESSION["email"];
+    $user_points = getUserPoints($_SESSION["username"])[0];
+}
+
+restore_error_handler();
 
 $shop_items = getShopItems();   //get all rows in the table
-$user_points = getUserPoints($_SESSION["username"])[0];
+// $user_points = getUserPoints($_SESSION["username"])[0];
 ?>
 
 
@@ -84,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
      <!-- Top Navigation Bar [ Minesweeper Title, User Profile Button ]-->
     <nav class="navbar navbar-expand-lg px-3">
         <div class="container-fluid">
-            <a class="navbar-parent">Minesweeper</a>
+            <a href = "index.php" class="navbar-parent">Minesweeper</a>
             <div class="d-flex align-items-center">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
                     alt="Profile Picture" id="pfp" class="rounded-circle me-2" width="40" height="40">
@@ -99,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="profile.html">Profile</a></li>
                         <li> <hr class="dropdown-divider"> </li>
-                        <li><a class="dropdown-item" href="login_page.html">Logout</a></li>
+                        <li><a class="dropdown-item" href="login.php">Login</a></li>
                     </ul>
                 </div>
             </div>
@@ -108,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
     <div class="nav flex-row">
         <ul class="vertical-nav">
-            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="index.php">Home</a>
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
             <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
             or disable them? -->

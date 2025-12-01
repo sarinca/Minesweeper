@@ -32,7 +32,7 @@
     <!-- Top Navigation Bar [ Minesweeper Title, User Profile Button ]-->
     <nav class="navbar navbar-expand-lg px-3">
         <div class="container-fluid">
-            <a class="navbar-parent">Minesweeper</a>
+            <a href = "index.php" class="navbar-parent">Minesweeper</a>
             <div class="d-flex align-items-center">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
                     alt="Profile Picture" id="pfp" class="rounded-circle me-2" width="40" height="40">
@@ -47,7 +47,7 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="profile.html">Profile</a></li>
                         <li> <hr class="dropdown-divider"> </li>
-                        <li><a class="dropdown-item" href="login_page.html">Logout</a></li>
+                        <li><a class="dropdown-item" href="login.php">Login</a></li>
                     </ul>
                 </div>
             </div>
@@ -56,7 +56,7 @@
 
     <nav class="nav flex-row">
         <ul class="vertical-nav">
-            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="index.php">Home</a>
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
             <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
             or disable them? used to have aria-disabled="true" on the shop link but megan took off for dev-->
@@ -69,7 +69,7 @@
             </div>
             <div style = "display:flex; justify-content: center;">
                 <!-- NOTE: WE NEED TO CHANGE THIS LINK SO IT GOES TO THE CREATE GAME PAGE-->
-                <a class="btn btn-primary" href="index.html">Start a game!</a>
+                <a class="btn btn-primary" href="index.php">Start a game!</a>
             </div>
             
         </div>

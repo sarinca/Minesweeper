@@ -100,7 +100,7 @@ $message = "";
     <body>
         <nav class="navbar navbar-expand-md px-3 d-none d-md-block">
             <div class="container-fluid">
-                <a class="navbar-brand navbar-parent" href="index.html">Minesweeper</a>
+                <a class="navbar-brand navbar-parent" href="index.php">Minesweeper</a>
             </div>
         </nav>
 
@@ -110,7 +110,7 @@ $message = "";
                 <div class="col-12 col-md-3 d-none d-md-block"> 
                     <nav class="nav flex-column">
                         <ul class="vertical-nav">
-                            <a class="nav-link" href="index.html">Home</a>
+                            <a class="nav-link" href="index.php">Home</a>
                             <a class="nav-link active" href="login.php">Login</a>
                             <a class="nav-link" href="?command=play">Play</a>
                             <!-- we need a leaderboard (log vs not logged in) -->
@@ -122,7 +122,7 @@ $message = "";
                 <!-- visible only on small screen -->
                 <nav class="navbar navbar-expand-md px-3 d-md-none shadow-sm">
                     <div class="container-fluid">
-                        <a class="navbar-brand fw-bold">Minesweeper</a>
+                        <a href = "index.php" class="navbar-brand fw-bold">Minesweeper</a>
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
@@ -130,7 +130,7 @@ $message = "";
                         <div class="collapse navbar-collapse" id="navbarNav">
                             <ul class="navbar-nav">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="index.html">Home</a>
+                                    <a class="nav-link" href="index.php">Home</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link active" href="login.php">Login</a>
