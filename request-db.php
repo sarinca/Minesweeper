@@ -1,42 +1,4 @@
 <?php
-// function addRequests($reqDate, $roomNumber, $reqBy, $repairDesc, $reqPriority)
-// {
-//     global $db; 
-
-//     // good way, minimize sql injection
-//     $query = "INSERT INTO requests (reqDate, roomNumber, reqBy, repairDesc, reqPriority) VALUES (:reqDate, :roomNumber, :reqBy, :repairDesc, :reqPriority)";  
-//     try {
-//         // bad way
-//         //$statement = $db->query($query);
-
-//         // good way
-//         $statement = $db->prepare($query);
-//         $statement->bindValue(':reqDate', $reqDate);
-//         $statement->bindValue(':roomNumber', $roomNumber);
-//         $statement->bindValue(':reqBy', $reqBy);
-//         $statement->bindValue(':repairDesc', $repairDesc);
-//         $statement->bindValue(':reqPriority', $reqPriority);
-//         $statement->execute();
-
-//         $statement->closeCursor();
-
-//         // most likely, there should not be a problem adding a request since 
-//         // a primary key of the table is auto_increment
-//         // if ($statement->rowCount() == 0)
-//         //     echo "Failed to add a request <br/>";
-//     }
-//     catch (PDOException $e) 
-//     {
-//         echo $e->getMessage();
-
-//         // if there is a specific SQL-related error message
-//         //    echo "generic message (don't reveal SQL-specific message)";
-//     }
-//     catch (Exception $e)
-//     {
-//        echo $e->getMessage();    // be careful, try to make it generic
-//     }
-// }
 
 // -------------------- REGISTER FUNCTIONS -------------------- //
 function check_registration($email, $username) {

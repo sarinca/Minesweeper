@@ -8,13 +8,16 @@ set_error_handler(function() {
     /* Intentionally ignore all errors during this block */ 
 });
 
+$user_loggedIn = false;
+
 if ($_SESSION["username"] == NULL){
     echo "Session not established yet";
     $user_points = 999;
 } else {
-    echo $_SESSION["username"];
-    echo " ";
-    echo $_SESSION["email"];
+    // echo $_SESSION["username"];
+    // echo " ";
+    // echo $_SESSION["email"];
+    $user_loggedIn = true;
     $user_points = getUserPoints($_SESSION["username"])[0];
 }
 
@@ -104,16 +107,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
                 <div class="profile-dropdown">
                     <!-- Dropdown toggle button (always shows username) -->
-                    <button class="btn dropdown-toggle" type="button" id="userDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        defaultUser
-                    </button>
+                    <?php 
+                     if ($user_loggedIn == true) {
+                        //show the user's information here 
+                        echo '<button class="btn dropdown-toggle" type="button" id="userDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">' . $_SESSION["username"] . 
+                            '</button>
 
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="profile.html">Profile</a></li>
-                        <li> <hr class="dropdown-divider"> </li>
-                        <li><a class="dropdown-item" href="login.php">Login</a></li>
-                    </ul>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                                <li> <hr class="dropdown-divider"> </li>
+                                <li><a class="dropdown-item" href="login.php">Logout</a></li>
+                            </ul>';
+                     }
+                     ?>
                 </div>
             </div>
         </div>
