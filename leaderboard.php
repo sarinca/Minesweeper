@@ -3,9 +3,7 @@ require('connect-db.php');         // include()
 require('request-db.php');
 
 session_start();
-// echo $_SESSION["username"];
-// echo " ";
-// echo $_SESSION["email"];
+
 
 set_error_handler(function() { 
     /* Intentionally ignore all errors during this block */ 

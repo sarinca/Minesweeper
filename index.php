@@ -1,3 +1,27 @@
+<?php 
+require('connect-db.php');         // include() 
+require('request-db.php');
+
+session_start();
+
+$user_loggedIn = false;
+
+set_error_handler(function() { 
+    /* Intentionally ignore all errors during this block */ 
+});
+
+if ($_SESSION["username"] == NULL){
+    // echo "Session not established yet";
+} else {
+    // echo $_SESSION["username"];
+    // echo " ";
+    // echo $_SESSION["email"];
+    $user_loggedIn = true;
+}
+
+restore_error_handler();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -57,20 +81,32 @@
     <nav class="nav flex-row">
         <ul class="vertical-nav">
             <a class="nav-link" href="index.php">Home</a>
-            <a class="nav-link" href="leaderboard.php">Leaderboard</a>
-            <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
-            or disable them? used to have aria-disabled="true" on the shop link but megan took off for dev-->
-            <a class="nav-link" href="shop.php" tabindex="-1" >Shop</a>
+            <?php if ($user_loggedIn == false) {echo "<a class='nav-link' href='login.php'>Login</a>";}?>
+            <?php if ($user_loggedIn == false) {echo "<a class='nav-link' href='register.php'>Register</a>";}?>
+            <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='leaderboard.php'>Leaderboard</a>";}?>
+            <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='shop.php' tabindex='-1'>Shop</a>";}?>
         </ul>
         <div class="m-5" style="width:68%;"> 
             <h2 class="mb-4"> How to Play!</h2>
             <div style = "display:flex; justify-content: center;">
                 <img src="./images/how_to_play_2.jpg">
             </div>
-            <div style = "display:flex; justify-content: center;">
-                <!-- NOTE: WE NEED TO CHANGE THIS LINK SO IT GOES TO THE CREATE GAME PAGE-->
-                <a class="btn btn-primary" href="index.php">Start a game!</a>
-            </div>
+            <?php 
+            if ($user_loggedIn == true){
+                //display a button that says play game
+                //NOTE: we need to change this link so that we can link it to the game page
+                echo '<div style = "display:flex; justify-content: center;">
+                <a class="btn loginbtn rounded-pill" href="index.php">Start a game!</a>
+                </div>';
+            } else {
+                //log in to play!
+
+                echo '<div style = "display:flex; justify-content: center;">
+                <a class="btn loginbtn rounded-pill" href="login.php">Login to play a game!</a>
+                </div>';
+            }
+            ?>
+           
             
         </div>
     </nav>

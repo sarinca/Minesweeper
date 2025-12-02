@@ -3,6 +3,24 @@ session_start();
 include_once('connect-db.php');         
 include_once('request-db.php');
 $message = "";
+
+// this is to determine which links are active on the side nav
+$user_loggedIn = false;
+
+set_error_handler(function() { 
+    /* Intentionally ignore all errors during this block */ 
+});
+
+if ($_SESSION["username"] == NULL){
+    // echo "Session not established yet";
+} else {
+    // echo $_SESSION["username"];
+    // echo " ";
+    // echo $_SESSION["email"];
+    $user_loggedIn = true;
+}
+
+restore_error_handler();
 ?>
 
 <?php
@@ -91,6 +109,15 @@ $message = "";
 
             <!-- href="../styles.css" -->
         <link rel="stylesheet" href="styles.css">
+        <style>
+            .navbar {
+                position: relative !important;
+            }
+            .vertical-nav {
+                position: relative !important;
+                top: 0px !important;
+            }
+        </style>
     </head>
 
     <body data-new-gr-c-s-check-loaded="14.1093.0" data-gr-ext-installed="">
@@ -105,10 +132,13 @@ $message = "";
                 <div class="col-12 col-md-3 d-none d-md-block"> 
                     <nav class="nav flex-column">
                         <ul class="vertical-nav">
-                            <a class="nav-link" href="index.html">Home</a>
-                            <a class="nav-link" href="login.php">Login</a>
-                            <a class="nav-link" href="?command=play">Play</a>
-                            <a class="nav-link" href="leaderboard,php">Leaderboard</a>
+                            <!--NEW! links are disabled if the user is not logged in  -->
+                            <a class="nav-link" href="index.php">Home</a>
+                            <?php if ($user_loggedIn == false) {echo "<a class='nav-link' href='login.php'>Login</a>";}?>
+                            <?php if ($user_loggedIn == false) {echo "<a class='nav-link active' href='register.php'>Register</a>";}?>
+                            <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='?command=play'>Play</a>";}?>
+                            <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='leaderboard.php'>Leaderboard</a>";}?>
+                            <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='shop.php'>Shop</a>";}?>
                         </ul>
                     </nav>
                 </div>

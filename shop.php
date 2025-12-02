@@ -6,7 +6,6 @@ session_start();
 
 set_error_handler(function() { 
     /* Intentionally ignore all errors during this block */ 
-
 });
 
 if ($_SESSION["username"] == NULL){
