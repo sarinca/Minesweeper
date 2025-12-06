@@ -4,6 +4,14 @@ require('request-db.php');
 
 session_start();
 
+// LOG OUT FUNCTIONALITY (COPY PASTE AND FOR HREF, DO pagename.php?action=logout
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    header("Location: index.php"); // or login.php idk what we want
+    exit;
+}
+
 set_error_handler(function() { 
     /* Intentionally ignore all errors during this block */ 
 });
@@ -117,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                                 <li> <hr class="dropdown-divider"> </li>
-                                <li><a class="dropdown-item" href="login.php">Logout</a></li>
+                                <li><a class="dropdown-item" href="shop.php?action=logout">Logout</a></li>
                             </ul>';
                      }
                      ?>
