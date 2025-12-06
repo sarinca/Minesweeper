@@ -238,7 +238,7 @@ $width = $gamemodeInfo['width'];
                             if (!gameStarted) {
                                 gameStarted = true;
                                 startDisplayTimer();
-                                alert("Timer started!");
+                                // alert("Timer started!");
                             }
 
                             if (cell.classList.contains("flagged")) {
