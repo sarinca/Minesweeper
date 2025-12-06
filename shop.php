@@ -118,6 +118,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .dropdown-menu {
             margin-right: 50px;
         }
+        .vertical-nav {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            width: 200px;
+            height: calc(100vh - 70px);
+            background-color: rgba(252, 245, 217);
+            padding: 2rem 0;
+            z-index: 999;
+        }
+
+        .vertical-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .vertical-nav .nav-link {
+            color: #000000ff;
+            padding: 1rem 1.5rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            display: block;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .vertical-nav .nav-link:hover {
+            background-color: #fbe9af;
+            border-left-color: #ffc562;
+        }
     </style>
 </head>
 

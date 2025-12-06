@@ -694,7 +694,7 @@ $userInventory = getUserInventory($user_id);
 
         <hr>
         <div class="stats-container">
-            <p class="stat-label">Total Coins: <span class="stat-box"> 555 </span></p>
+            <p class="stat-label">Total Coins: <span class="stat-box"> <?php echo $userStats['points']; ?></span></p>
             <p class="stat-label">Total Score: <span class="stat-box"><?php echo $userStats['totalScore']; ?></span></p>
             <p class="stat-label">Games Played: <span
                     class="stat-box"><?php echo $gamesPlayed['games_played']; ?></span></p>
