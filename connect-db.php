@@ -18,6 +18,9 @@ try
    // Create an instance of PDO (PHP Data Objects) which connects to a MySQL database
    // (PDO defines an interface for accessing databases)
    $db = new PDO($dsn, $username, $password);
+   
+   // dispaly a message to let us know that we are connected to the database 
+   // echo "<p>You are connected to the database -- host=$host</p>";
 }
 catch (PDOException $e)     // handle a PDO exception (errors thrown by the PDO library)
 {

@@ -1,4 +1,28 @@
 <?php
+require('connect-db.php');
+
+var_dump($_SERVER['REQUEST_METHOD'], $_POST['action']);
+// detect action for updating game state w/o reloading page
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameState') {
+    echo "updating game state...";
+    updateGameState($_POST['gameId'], $_POST['game_state'], $_POST['state_status']);
+    exit();
+} 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updatePoints') {
+    echo "updating points...";
+    updatePoints($_POST['gameId'], $_POST['mode']);
+    exit();
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameTime') {
+    echo "updating game time...";
+    updateGameTime($_POST['gameId'], $_POST['gameTime']);
+    exit();
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'addLeaderboardEntry') {
+    echo "adding leaderboard entry...";
+    addLeaderboardEntry($_POST['gameId']);
+    exit();
+}
 
 // -------------------- REGISTER FUNCTIONS -------------------- //
 function check_registration($email, $username) {
@@ -57,6 +81,7 @@ function register($email, $username, $password) {
 }
 
 // -------------------- LOGIN FUNCTIONS -------------------- //
+
 function login($username) {
     global $db;
     $query = "SELECT * FROM user NATURAL JOIN profile WHERE username = :username";
@@ -463,4 +488,262 @@ function getUserInventory($user_id) {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// ---------------------- GAME FUNCTIONS ---------------------- //
+
+function getGamemodeInfo($mode){
+    global $db;
+
+    $query = "SELECT mode, height, width, numBombs FROM gamemode WHERE mode = :mode";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':mode', $mode);
+
+    $statement->execute();
+    $results = $statement->fetch(); 
+    $statement->closeCursor();
+    
+    return $results;
+
+}
+
+function addNewGame($currUsername, $gameInfo){
+    echo "Adding new game...";
+    global $db;
+
+    $mode = $gameInfo['mode'];
+    $height = $gameInfo['height'];
+    $width = $gameInfo['width'];
+    $numBombs = $gameInfo['numBombs'];
+
+    echo "received info for mode, height, width, numBombs";
+
+    $totalCells = $height * $width;
+
+    $boxesClicked = array_fill(0, $totalCells, "0");
+    $bombPlacement = array_fill(0, $totalCells-$numBombs, "0");
+    for ($i = 0; $i < $numBombs; $i++){
+        array_push($bombPlacement, "1");
+    }
+    shuffle($bombPlacement);
+
+    $state_boxesClicked = implode("", $boxesClicked);
+    $state_bombPlacement = implode("", $bombPlacement);
+
+    $userId = $currUsername; // currently doesnt work but i think thats bc defaultUser doesnt have an actual userId?
+
+    $gameTime = 0;
+    echo "querying...";
+
+    try{
+
+        $query = "INSERT INTO game (
+        userId, 
+        state_boxesClicked, 
+        state_bombPlacement, 
+        mode, 
+        gameTime)
+        VALUES (
+        :userId,
+        :state_boxesClicked,
+        :state_bombPlacement,
+        :mode,
+        :gameTime)";
+
+        $statement = $db->prepare($query);
+
+        $statement->bindValue(':userId', $userId); // is this accessible anywhere?
+        $statement->bindValue(':state_boxesClicked', $state_boxesClicked);
+        $statement->bindValue(':state_bombPlacement', $state_bombPlacement);
+        $statement->bindValue(':mode', $mode);
+        $statement->bindValue(':gameTime', $gameTime);
+        $statement->execute();
+        $statement->closeCursor();
+
+        $gameId = $db->lastInsertId();
+
+        $query2 = "INSERT INTO state (
+        gameId,
+        state_boxesClicked,
+        state_bombPlacement)
+        VALUES (
+        :gameId,
+        :state_boxesClicked,
+        :state_bombPlacement)";
+
+        $statement2 = $db->prepare($query2);
+
+        $statement2->bindValue(':gameId', $gameId); // is this accessible anywhere?
+        $statement2->bindValue(':state_boxesClicked', $state_boxesClicked);
+        $statement2->bindValue(':state_bombPlacement', $state_bombPlacement);
+        $statement2->execute();
+        $statement2->closeCursor();  
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
+    header("Location: game.php?gameId=" . $gameId);
+    exit();
+
+}
+
+/* Functions for updating/playing the game */
+
+function getGameInfo($gameId){
+    global $db;
+
+    $query = "SELECT * FROM game WHERE gameId = :gameId";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':gameId', $gameId);
+
+    $statement->execute();
+    $results = $statement->fetch(); 
+    $statement->closeCursor();
+    
+    return $results;
+}
+
+function getGameStateInfo($gameId){
+    global $db;
+
+    $query = "SELECT * FROM state WHERE gameId = :gameId";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':gameId', $gameId);
+    $statement->execute();
+    $results = $statement->fetch(); 
+    $statement->closeCursor();
+    
+    return $results;
+}
+
+function updateGameState($gameId, $game_state, $state_status){ //game_state is state_boxesClicked
+    global $db;
+    // echo "inside updating game state";
+    // var_dump($gameId, $game_state, $state_status);
+
+    try {
+        // echo "preparing query...";
+        $query1 = "UPDATE state SET state_boxesClicked = :game_state, state_status = :state_status WHERE gameId = :gameId";
+        // echo "query written...";
+        $statement1 = $db->prepare($query1);
+        // echo "binding values...";
+        $statement1->bindValue(':gameId', $gameId);
+        $statement1->bindValue(':game_state', $game_state);
+        $statement1->bindValue(':state_status', $state_status);
+        $statement1->execute();
+        // echo "Rows updated in state: " . $statement1->rowCount();
+        $statement1->closeCursor();
+
+        $query2 = "UPDATE game SET state_boxesClicked = :game_state WHERE gameId = :gameId";
+        $statement2 = $db->prepare($query2);
+        $statement2->bindValue(':gameId', $gameId);
+        $statement2->bindValue(':game_state', $game_state);
+        $statement2->execute();
+        $statement2->closeCursor();
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
+}
+
+function updatePoints($gameId, $mode){ 
+    global $db;
+
+    try {
+        // Fetch userId and gameTime from game table
+        $query1 = "SELECT userId FROM game WHERE gameId = :gameId";
+        $statement1 = $db->prepare($query1);
+        $statement1->bindValue(':gameId', $gameId);
+        $statement1->execute();
+        $gameData = $statement1->fetch();
+        $statement1->closeCursor();
+
+        $userId = $gameData['userId'];
+
+        // Calculate points based on mode and gameTime
+        $pointsEarned = 0;
+        if ($mode === 'Easy') {
+            $pointsEarned = 5;
+        } elseif ($mode === 'Medium') {
+            $pointsEarned = 30;
+        } elseif ($mode === 'Hard') {
+            $pointsEarned = 80;
+        }
+
+        // Update profile table with new points and totalScore
+        $query2 = "UPDATE profile SET points = points + :pointsEarned, totalScore = totalScore + :pointsEarned WHERE userId = :userId";
+        $statement2 = $db->prepare($query2);
+        $statement2->bindValue(':pointsEarned', $pointsEarned);
+        $statement2->bindValue(':userId', $userId);
+        $statement2->execute();
+        $statement2->closeCursor();
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
+}
+
+function updateGameTime($gameId, $gameTime){
+    global $db;
+
+
+    try {
+        $query = "UPDATE game SET gameTime = :gameTime WHERE gameId = :gameId";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':gameId', $gameId);
+        $statement->bindValue(':gameTime', $gameTime);
+        $statement->execute();
+        $statement->closeCursor();
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
+}
+
+function addLeaderboardEntry($gameId){
+    global $db;
+
+
+    try {
+
+        $query1 = "SELECT userId FROM game WHERE gameId = :gameId";
+        $statement1 = $db->prepare($query1);
+        $statement1->bindValue(':gameId', $gameId);
+        $statement1->execute();
+        $gameData = $statement1->fetch();
+        $statement1->closeCursor();
+
+        $userId = $gameData['userId'];
+
+        $query2 = "INSERT INTO leaderboardEntry (gameId, userId) VALUES (:gameId, :userId)";
+        $statement2 = $db->prepare($query2);
+        $statement2->bindValue(':gameId', $gameId);
+        $statement2->bindValue(':userId', $userId);
+        $statement2->execute();
+        $statement2->closeCursor();
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
+}
+
 ?>
+
