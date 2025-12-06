@@ -68,6 +68,14 @@ $userInventory = getUserInventory($user_id);
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
 
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -102,6 +110,10 @@ $userInventory = getUserInventory($user_id);
         .profile-dropdown {
             background-color: rgba(252, 245, 217);
             width: 100px;
+            margin-right: 80px;
+        }
+        .dropdown-menu {
+            margin-right: 50px;
         }
 
         #profile-select:hover {
@@ -145,9 +157,14 @@ $userInventory = getUserInventory($user_id);
             justify-content: space-between;
             margin-top: 50px;
             margin-left: 400px;
+            margin-right: 100px;
             font-size: 24px;
             width: 150px;
             border-radius: 15px;
+        }
+
+        #editPfpBtn:hover {
+            background-color: #fbe9af;
         }
 
         .container {
@@ -160,6 +177,12 @@ $userInventory = getUserInventory($user_id);
         #name\&stats {
             background: transparent;
             padding: 0;
+        }
+
+        .nameSpace {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            width: 100% !important;
         }
 
         .user-and-pfp {
@@ -596,11 +619,11 @@ $userInventory = getUserInventory($user_id);
                     </button>
 
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                        <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="login_page.html">Logout</a></li>
+                        <li><a class="dropdown-item" href="">Logout</a></li>
                     </ul>
                 </div>
             </div>
@@ -609,9 +632,9 @@ $userInventory = getUserInventory($user_id);
 
     <nav class="nav flex-column">
         <ul class="vertical-nav">
-            <a class="nav-link" href="home.html">Home</a>
-            <a class="nav-link" href="leaderboard.html">Leaderboard</a>
-            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Shop</a>
+            <a class="nav-link" href="index.php">Home</a>
+            <a class="nav-link" href="leaderboard.php">Leaderboard</a>
+            <a class="nav-link" href="shop.php">Shop</a>
         </ul>
     </nav>
 
@@ -622,7 +645,7 @@ $userInventory = getUserInventory($user_id);
                 : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>" alt="Profile Picture"
                 id="bigPfp" class="rounded-circle me-2" width="60" height="60">
 
-            <h1>Hello, <?php echo htmlspecialchars($userStats['username']); ?></h1>
+            <h1 class = "nameSpace">Hello, <?php echo htmlspecialchars($userStats['username']); ?></h1>
             <!-- Button to Edit PFP & Username -->
             <button class="btn" id="editPfpBtn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                 Edit

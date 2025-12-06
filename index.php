@@ -1,22 +1,28 @@
-<?php 
-require('connect-db.php');         // include() 
+<?php
+require('connect-db.php');
 require('request-db.php');
 
 session_start();
 
 $user_loggedIn = false;
+$userStats = null;
 
-set_error_handler(function() { 
-    /* Intentionally ignore all errors during this block */ 
+set_error_handler(function () {
+    /* Intentionally ignore all errors during this block */
 });
 
-if ($_SESSION["username"] == NULL){
+if ($_SESSION["username"] == NULL) {
     // echo "Session not established yet";
 } else {
     // echo $_SESSION["username"];
     // echo " ";
     // echo $_SESSION["email"];
     $user_loggedIn = true;
+
+    if (isset($_SESSION['user_id'])) {
+        $user_id = $_SESSION['user_id'];
+        $userStats = getUserStats($user_id);
+    }
 }
 
 restore_error_handler();
@@ -42,12 +48,24 @@ restore_error_handler();
             --bs-btn-bg: #7ba1f5;
             --bs-btn-border-color: #82a1e5;
         }
+
         .navbar {
             position: relative !important;
         }
+
         .vertical-nav {
             position: relative !important;
             top: 0px !important;
+        }
+
+        .profile-dropdown {
+            background-color: rgba(252, 245, 217);
+            width: 100px;
+            margin-right: 80px;
+        }
+
+        .dropdown-menu {
+            margin-right: 50px;
         }
     </style>
 </head>
@@ -56,53 +74,56 @@ restore_error_handler();
     <!-- Top Navigation Bar [ Minesweeper Title, User Profile Button ]-->
     <nav class="navbar navbar-expand-lg px-3">
         <div class="container-fluid">
-            <a href = "index.php" class="navbar-parent">Minesweeper</a>
-            <div class="d-flex align-items-center">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
-                    alt="Profile Picture" id="pfp" class="rounded-circle me-2" width="40" height="40">
+            <a class="navbar-parent">Minesweeper</a>
+            <?php if ($user_loggedIn && $userStats): ?>
+                <div class="d-flex align-items-center">
+                    <img src="<?php echo !empty($userStats['profilePicture_path'])
+                        ? htmlspecialchars($userStats['profilePicture_path'])
+                        : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>" id="pfp"
+                        class="rounded-circle me-2" width="40" height="40">
 
-                <div class="profile-dropdown">
-                    <!-- Dropdown toggle button (always shows username) -->
-                     <?php 
-                     if ($user_loggedIn == true) {
-                        //show the user's information here 
-                        echo '<button class="btn dropdown-toggle" type="button" id="userDropdown"
-                                data-bs-toggle="dropdown" aria-expanded="false">' . $_SESSION["username"] . 
-                            '</button>
+                    <div class="profile-dropdown">
+                        <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <?php echo htmlspecialchars($userStats['username']); ?>
+                        </button>
 
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                                <li> <hr class="dropdown-divider"> </li>
-                                <li><a class="dropdown-item" href="login.php">Logout</a></li>
-                            </ul>';
-                        }
-                    //  } else {
-                    //     echo '<a class="btn loginbtn" href="login.php">
-                    //             Login
-                    //         </a>';
-                    //  }
-                     ?>
-                    
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </nav>
 
     <nav class="nav flex-row">
         <ul class="vertical-nav">
             <a class="nav-link" href="index.php">Home</a>
-            <?php if ($user_loggedIn == false) {echo "<a class='nav-link' href='login.php'>Login</a>";}?>
-            <?php if ($user_loggedIn == false) {echo "<a class='nav-link' href='register.php'>Register</a>";}?>
-            <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='leaderboard.php'>Leaderboard</a>";}?>
-            <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='shop.php' tabindex='-1'>Shop</a>";}?>
+            <?php if ($user_loggedIn == false) {
+                echo "<a class='nav-link' href='login.php'>Login</a>";
+            } ?>
+            <?php if ($user_loggedIn == false) {
+                echo "<a class='nav-link' href='register.php'>Register</a>";
+            } ?>
+            <?php if ($user_loggedIn == true) {
+                echo "<a class='nav-link' href='leaderboard.php'>Leaderboard</a>";
+            } ?>
+            <?php if ($user_loggedIn == true) {
+                echo "<a class='nav-link' href='shop.php' tabindex='-1'>Shop</a>";
+            } ?>
         </ul>
-        <div class="m-5" style="width:68%;"> 
+        <div class="m-5" style="width:68%;">
             <h2 class="mb-4"> How to Play!</h2>
-            <div style = "display:flex; justify-content: center;">
+            <div style="display:flex; justify-content: center;">
                 <img src="./images/how_to_play_2.jpg">
             </div>
-            <?php 
-            if ($user_loggedIn == true){
+            <?php
+            if ($user_loggedIn == true) {
                 //display a button that says play game
                 //NOTE: we need to change this link so that we can link it to the game page
                 echo '<div style = "display:flex; justify-content: center;">
@@ -110,14 +131,14 @@ restore_error_handler();
                 </div>';
             } else {
                 //log in to play!
-
+            
                 echo '<div style = "display:flex; justify-content: center;">
                 <a class="btn loginbtn rounded-pill" href="login.php">Login to play a game!</a>
                 </div>';
             }
             ?>
-           
-            
+
+
         </div>
     </nav>
 
