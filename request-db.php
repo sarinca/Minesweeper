@@ -486,4 +486,19 @@ function addFriend($user_id, $friend_id) {
     return $success;
 }
 
+function getUserInventory($user_id) {
+    global $db;
+    $query = "SELECT ii.itemId, ii.name, id.picPath as image_path, COUNT(b.itemId) as quantity
+              FROM itemInventory ii
+              JOIN itemDetails id ON ii.name = id.name
+              LEFT JOIN buys b ON ii.itemId = b.itemId AND b.userId = :user_id
+              WHERE b.userId = :user_id
+              GROUP BY ii.itemId, ii.name, id.picPath
+              ORDER BY ii.name";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':user_id', $user_id);
+    $statement->execute();
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>

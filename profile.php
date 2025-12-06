@@ -7,6 +7,13 @@ require_once('request-db.php');
 
 $user_id = 1;
 
+// if (!isset($_SESSION['user_id'])) {
+//     header("Location: login.php");
+//     exit();
+// }
+
+// $user_id = $_SESSION['user_id'];
+
 if (isset($_GET['search_users'])) {
     header('Content-Type: application/json');
     $query = $_GET['q'] ?? '';
@@ -46,6 +53,7 @@ $userStats = getUserStats($user_id);
 $gamesPlayed = getGamesPlayed($user_id);
 $gameHistory = getGameHistory($user_id);
 $userFriends = getUserFriends($user_id);
+$userInventory = getUserInventory($user_id);
 ?>
 
 <!DOCTYPE html>
@@ -132,8 +140,18 @@ $userFriends = getUserFriends($user_id);
             border-left-color: #ffc562;
         }
 
+        #editPfpBtn {
+            background-color: white;
+            justify-content: space-between;
+            margin-top: 50px;
+            margin-left: 400px;
+            font-size: 24px;
+            width: 150px;
+            border-radius: 15px;
+        }
+
         .container {
-            margin-left: 220px;
+            margin-left: 270px;
             margin-top: 150px;
             padding: 2rem;
             max-width: 80%
@@ -175,7 +193,7 @@ $userFriends = getUserFriends($user_id);
         .stats-container {
             padding: 15px;
             padding-left: 100px;
-            max-width: 100%;
+            max-width: 90%;
             color: #000000ff;
             font-weight: bold;
             background-color: #f9c74f;
@@ -221,6 +239,7 @@ $userFriends = getUserFriends($user_id);
 
         .accordion {
             margin-top: 2rem;
+            max-width: 90%;
         }
 
         .accordion-item {
@@ -239,6 +258,7 @@ $userFriends = getUserFriends($user_id);
             display: flex;
             align-items: center;
             width: 100%;
+            justify-content: space-between;
         }
 
         .accordion-button:not(.collapsed) {
@@ -305,6 +325,10 @@ $userFriends = getUserFriends($user_id);
 
         .table tbody tr:hover {
             background-color: #fffacd;
+        }
+
+        .table td:last-child {
+            text-align: right;
         }
 
         .btn-danger {
@@ -395,77 +419,11 @@ $userFriends = getUserFriends($user_id);
             outline: none;
         }
 
-        .stick {
-            position: absolute;
-            height: 1em;
-            width: 0.1em;
-            right: 1em;
-            top: 50%;
-            transform: translate(0%, -50%);
-            pointer-events: none;
-        }
-
-        .stick:before,
-        .stick:after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            transition: transform 0.6s cubic-bezier(.6, 0, .4, 1);
-        }
-
-        .stick:before {
-            transform: rotate(45deg);
-        }
-
-        .stick:after {
-            transform: rotate(-45deg);
-        }
-
-        /* Collapsed state */
-        .one {
-            transform: translateX(50%) translateX(-1em);
-        }
-
-        .two {
-            transform: translateX(-100%) translateX(1em);
-        }
-
-        .three {
-            transform: translateX(100%);
-        }
-
+        .one,
+        .two,
+        .three,
         .four {
-            transform: translateX(-100%);
-        }
-
-        .stick:before,
-        .stick:after {
-            transform: rotate(-45deg) translateY(150%);
-        }
-
-        /* Expanded state */
-        .search:focus-within .one,
-        .search:focus-within .two,
-        .search:focus-within .three,
-        .search:focus-within .four {
-            transform: translateX(0);
-        }
-
-        .search:focus-within .stick {
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        .search:focus-within .stick:before {
-            transform: rotate(45deg);
-        }
-
-        .search:focus-within .stick:after {
-            transform: rotate(-45deg);
+            transform: translateX(0) !important;
         }
 
         /* Search Results */
@@ -488,6 +446,48 @@ $userFriends = getUserFriends($user_id);
 
         .search-result-item:hover {
             background-color: #fffacd;
+        }
+
+        /* INVENTORY CSS */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .inventory-item {
+            background-color: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .inventory-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: #ffc562;
+        }
+
+        .inventory-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+
+        .inventory-name {
+            font-weight: bold;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .inventory-quantity {
+            color: #666;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -538,7 +538,7 @@ $userFriends = getUserFriends($user_id);
 
             <h1>Hello, <?php echo htmlspecialchars($userStats['username']); ?></h1>
             <!-- Button to Edit PFP & Username -->
-            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <button class="btn" id="editPfpBtn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                 Edit
             </button>
         </div>
@@ -585,7 +585,7 @@ $userFriends = getUserFriends($user_id);
 
         <hr>
         <div class="stats-container">
-            <p class="stat-label">Total Coins: <span class="stat-box"> Not Implemented Yet </span></p>
+            <p class="stat-label">Total Coins: <span class="stat-box"> 555 </span></p>
             <p class="stat-label">Total Score: <span class="stat-box"><?php echo $userStats['totalScore']; ?></span></p>
             <p class="stat-label">Games Played: <span
                     class="stat-box"><?php echo $gamesPlayed['games_played']; ?></span></p>
@@ -674,7 +674,7 @@ $userFriends = getUserFriends($user_id);
                                         <input type="search" class="four" id="friendSearch"
                                             placeholder="Search users..." onclick="event.stopPropagation()" />
                                     </div>
-                                    <div class="stick"></div>
+                                    <!-- <div class="stick"></div> -->
                                 </div>
                             </div>
                         </label>
@@ -688,14 +688,7 @@ $userFriends = getUserFriends($user_id);
                         <hr>
 
                         <!-- Current Friends List -->
-                        <h5 style="padding: 1rem;">Current Friends</h5>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Friend Username</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
+                        <table class="table">
                             <tbody>
                                 <?php foreach ($userFriends as $friend): ?>
                                     <tr>
@@ -715,6 +708,33 @@ $userFriends = getUserFriends($user_id);
                     </div>
                 </div>
             </div>
+            <!-- Inventory Accordion Item -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseInventory" aria-expanded="false" aria-controls="collapseInventory">
+                        Inventory
+                    </button>
+                </h2>
+                <div id="collapseInventory" class="accordion-collapse collapse" data-bs-parent="#dashboardAccordion">
+                    <div class="accordion-body" style="padding: 2rem;">
+                        <?php if (empty($userInventory)): ?>
+                            <p class="text-center text-muted">No items in inventory. Visit the shop to purchase items!</p>
+                        <?php else: ?>
+                            <div class="inventory-grid">
+                                <?php foreach ($userInventory as $item): ?>
+                                    <div class="inventory-item">
+                                        <img src="<?php echo htmlspecialchars($item['image_path']); ?>"
+                                            alt="<?php echo htmlspecialchars($item['name']); ?>" class="inventory-image">
+                                        <h6 class="inventory-name"><?php echo htmlspecialchars($item['name']); ?></h6>
+                                        <p class="inventory-quantity">Quantity: <?php echo $item['quantity']; ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
 
         </div>
         <!-- End Accordion Section -->
@@ -729,12 +749,6 @@ $userFriends = getUserFriends($user_id);
         console.log("=== DEBUG END ===");
     </script>
     <script>
-        // Clear search on X click
-        document.querySelector('.stick').addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.querySelector('.four').value = '';
-            document.getElementById('searchResults').innerHTML = '';
-        });
 
         // Search for users
         let searchTimeout;
