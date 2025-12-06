@@ -59,7 +59,7 @@ function register($email, $username, $password) {
 // -------------------- LOGIN FUNCTIONS -------------------- //
 function login($username) {
     global $db;
-    $query = "SELECT * FROM user WHERE username = :username";
+    $query = "SELECT * FROM user NATURAL JOIN profile WHERE username = :username";
     $statement = $db->prepare($query);
     $statement->bindValue(':username', $username);
     $statement->execute();
