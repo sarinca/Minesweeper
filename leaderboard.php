@@ -4,8 +4,17 @@ require('request-db.php');
 
 session_start();
 
+//log out functionality
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
+
 $user_loggedIn = false;
 $userStats = null;
+
 
 set_error_handler(function () {
     /* Intentionally ignore all errors during this block */
@@ -242,7 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                            <li><a class="dropdown-item" href="leaderboard.php?action=logout">Logout</a></li>
                         </ul>
                     </div>
                 </div>

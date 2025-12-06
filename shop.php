@@ -8,7 +8,7 @@ session_start();
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_unset();
     session_destroy();
-    header("Location: index.php"); // or login.php idk what we want
+    header("Location: index.php"); //can change to login if we want
     exit;
 }
 
@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                            <li><a class="dropdown-item" href="shop.php?action=logout">Logout</a></li>
                         </ul>
                     </div>
                 </div>

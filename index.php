@@ -4,6 +4,14 @@ require('request-db.php');
 
 session_start();
 
+//log out functionality
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
+
 $user_loggedIn = false;
 $userStats = null;
 
@@ -124,7 +132,7 @@ restore_error_handler();
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                            <li><a class="dropdown-item" href="index.php?action=logout">Logout</a></li>
                         </ul>
                     </div>
                 </div>
@@ -134,7 +142,7 @@ restore_error_handler();
 
     <nav class="nav flex-row">
         <ul class="vertical-nav">
-            <a class="nav-link" href="index.php">Home</a>
+            <a class="nav-link active" href="index.php">Home</a>
             <?php if ($user_loggedIn == false) {
                 echo "<a class='nav-link' href='login.php'>Login</a>";
             } ?>

@@ -2,6 +2,15 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
+
+// log out functionality
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    header("Location: index.php"); //can change to login if we want
+    exit;
+}
+
 require_once('connect-db.php');
 require_once('request-db.php');
 
@@ -623,7 +632,7 @@ $userInventory = getUserInventory($user_id);
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="">Logout</a></li>
+                        <li><a class="dropdown-item" href="profile.php?action=logout">Logout</a></li>
                     </ul>
                 </div>
             </div>
