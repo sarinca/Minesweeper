@@ -14,9 +14,6 @@ set_error_handler(function() {
 if ($_SESSION["username"] == NULL){
     // echo "Session not established yet";
 } else {
-    // echo $_SESSION["username"];
-    // echo " ";
-    // echo $_SESSION["email"];
     $user_loggedIn = true;
 }
 
@@ -107,82 +104,75 @@ restore_error_handler();
         <!-- ../styles.css -->
         <link rel="stylesheet" href="styles.css">
         <style>
-            /* .navbar {
+            tr.table-warning {
+                --bs-table-bg: #FFE9B1 !important;
+                /* Light Yellow */
+                border-color: #FFE9B1 !important;
+            }
+
+            tr.table-danger {
+                --bs-table-bg: #FFD788 !important;
+                /* Dark Yellow */
+                border-color: #FFD788 !important;
+            }
+
+            .btn-light {
+                --bs-btn-bg: #ffffff;
+                --bs-btn-hover-bg: #ffffff;
+                --bs-btn-hover-border-color: #ffffff;
+                --bs-btn-border-radius: 14px;
+                --bs-btn-active-bg: #ffffff;
+            }
+
+            .navbar {
                 position: relative !important;
             }
+
             .vertical-nav {
                 position: relative !important;
                 top: 0px !important;
-            } */
-                tr.table-warning {
-            --bs-table-bg: #FFE9B1 !important;
-            /* Light Yellow */
-            border-color: #FFE9B1 !important;
-        }
+            }
 
-        tr.table-danger {
-            --bs-table-bg: #FFD788 !important;
-            /* Dark Yellow */
-            border-color: #FFD788 !important;
-        }
+            .profile-dropdown {
+                background-color: rgba(252, 245, 217);
+                width: 100px;
+                margin-right: 80px;
+            }
 
-        .btn-light {
-            --bs-btn-bg: #ffffff;
-            --bs-btn-hover-bg: #ffffff;
-            --bs-btn-hover-border-color: #ffffff;
-            --bs-btn-border-radius: 14px;
-            --bs-btn-active-bg: #ffffff;
-        }
+            .dropdown-menu {
+                margin-right: 50px;
+            }
+            .vertical-nav {
+                position: fixed;
+                left: 0;
+                top: 70px;
+                width: 200px;
+                height: calc(100vh - 70px);
+                background-color: rgba(252, 245, 217);
+                padding: 2rem 0;
+                z-index: 999;
+            }
 
-        .navbar {
-            position: relative !important;
-        }
+            .vertical-nav ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
 
-        .vertical-nav {
-            position: relative !important;
-            top: 0px !important;
-        }
+            .vertical-nav .nav-link {
+                color: #000000ff;
+                padding: 1rem 1.5rem;
+                border-left: 4px solid transparent;
+                transition: all 0.3s ease;
+                display: block;
+                text-decoration: none;
+                font-weight: 500;
+            }
 
-        .profile-dropdown {
-            background-color: rgba(252, 245, 217);
-            width: 100px;
-            margin-right: 80px;
-        }
-
-        .dropdown-menu {
-            margin-right: 50px;
-        }
-        .vertical-nav {
-            position: fixed;
-            left: 0;
-            top: 70px;
-            width: 200px;
-            height: calc(100vh - 70px);
-            background-color: rgba(252, 245, 217);
-            padding: 2rem 0;
-            z-index: 999;
-        }
-
-        .vertical-nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .vertical-nav .nav-link {
-            color: #000000ff;
-            padding: 1rem 1.5rem;
-            border-left: 4px solid transparent;
-            transition: all 0.3s ease;
-            display: block;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .vertical-nav .nav-link:hover {
-            background-color: #fbe9af;
-            border-left-color: #ffc562;
-        }
+            .vertical-nav .nav-link:hover {
+                background-color: #fbe9af;
+                border-left-color: #ffc562;
+            }
         </style>
     </head>
 
@@ -199,7 +189,7 @@ restore_error_handler();
                 <div class="col-12 col-md-3 d-none d-md-block"> 
                     <nav class="nav flex-column">
                         <ul class="vertical-nav">
-                            <!--NEW! links are disabled if the user is not logged in  -->
+                            <!-- links are disabled if the user is not logged in  -->
                             <a class="nav-link" href="index.php">Home</a>
                             <?php if ($user_loggedIn == false) {echo "<a class='nav-link active' href='login.php'>Login</a>";}?>
                             <?php if ($user_loggedIn == false) {echo "<a class='nav-link' href='register.php'>Register</a>";}?>

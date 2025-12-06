@@ -4,7 +4,7 @@ require('request-db.php');
 
 session_start();
 
-// LOG OUT FUNCTIONALITY (COPY PASTE AND FOR HREF, DO pagename.php?action=logout
+// log out functionality (for log out dropdown href, do pagename.php?action=logout)
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_unset();
     session_destroy();
@@ -24,9 +24,6 @@ if ($_SESSION["username"] == NULL) {
     echo "Session not established yet";
     $user_points = 999;
 } else {
-    // echo $_SESSION["username"];
-    // echo " ";
-    // echo $_SESSION["email"];
     $user_loggedIn = true;
     $user_points = getUserPoints($_SESSION["username"])[0];
     
@@ -39,7 +36,6 @@ if ($_SESSION["username"] == NULL) {
 restore_error_handler();
 
 $shop_items = getShopItems();   //get all rows in the table
-// $user_points = getUserPoints($_SESSION["username"])[0];
 ?>
 
 
@@ -51,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($user_points >= $_POST['price']) {
 
             //TO-DO: turn this into a temporary success pop-up with information
-            echo "Bought " . $_POST['name'] . " for: " . $_POST['price'] . " points";
+            // echo "Bought " . $_POST['name'] . " for: " . $_POST['price'] . " points";
 
             //this updates the user points AND adds the item to the user's account 
             handlePurchase($_SESSION["username"], $_POST['name'], $_POST['price']);
@@ -59,11 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             echo "ERROR: You don't have enough points for this item, sorry";
         }
-
-        //RERENDER THE BUTTONS AND TEXT
     }
     if (!empty($_POST['extraPointsBtn'])) {
-        //this is the shortcut for testing 
+        //this is the shortcut for demo 
         addPointsForTesting($_SESSION["username"]);
         $user_points = $user_points + 100;
 
@@ -187,9 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <ul class="vertical-nav">
             <a class="nav-link" href="index.php">Home</a>
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
-            <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
-            or disable them? -->
-            <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
+            <a class="nav-link active" href="shop.php" tabindex="-1">Shop</a>
         </ul>
         <div class="m-5" style="width:68%;">
             <h2 class="mb-4"> Shop </h2>
@@ -222,7 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php endforeach; ?>
             </div>
             <form method="post" action="shop.php">
-                <input type="submit" name="extraPointsBtn" class="btn btn-primary"
+                <input type="submit" name="extraPointsBtn" class="btn btn-primary" style="margin-top: 325px"
                     value="Shh.. add 100 points to account"></input>
             </form>
         </div>
