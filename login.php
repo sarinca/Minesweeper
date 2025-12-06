@@ -107,6 +107,10 @@ restore_error_handler();
         <!-- ../styles.css -->
         <link rel="stylesheet" href="styles.css">
         <style>
+            body {
+                overflow: hidden;
+            }
+
             .navbar {
                 position: relative !important;
             }
