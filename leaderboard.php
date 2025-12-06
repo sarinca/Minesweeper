@@ -4,6 +4,14 @@ require('request-db.php');
 
 session_start();
 
+//log out functionality
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
+
 $user_loggedIn = false;
 $userStats = null;
 
@@ -14,9 +22,6 @@ set_error_handler(function () {
 if ($_SESSION["username"] == NULL) {
     echo "Session not established yet";
 } else {
-    // echo $_SESSION["username"];
-    // echo " ";
-    // echo $_SESSION["email"];
     $user_loggedIn = true;
 
     if (isset($_SESSION['user_id'])) {
@@ -75,22 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $selected_mode = $_POST['modeSelect'];
     $selected_users = $_POST['friendSelect'];
 
-    // echo "range: " . $_POST["myRange"] . "<br>";
-
     //handle the filter time
     if ($selected_mode == 'allPoints') {
         $selected_time = null; // Or use a large number to allow all entries
-        // echo "NULL TIME bc ALL POINTS";
     } else if ($_POST['myRange'] == $default_slider_value) {
         $selected_time = null;
-        // echo "NULL TIME bc default selected";
     } else {
         $selected_time = $_POST['myRange'];
     }
-
-    // echo "Mode selected: " . $_POST['modeSelect'];
-    // echo "Friend users selected: " . $_POST['friendSelect'];
-    // echo "Max time selected: " . $selected_time;
 
     $curr_username = $_SESSION["username"];
     //if mode changed, then update slider range
@@ -258,7 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                            <li><a class="dropdown-item" href="leaderboard.php?action=logout">Logout</a></li>
                         </ul>
                     </div>
                 </div>
@@ -270,9 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="nav flex-row">
         <ul class="vertical-nav">
             <a class="nav-link" href="index.php">Home</a>
-            <a class="nav-link" href="leaderboard.php">Leaderboard</a>
-            <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
-            or disable them? -->
+            <a class="nav-link active" href="leaderboard.php">Leaderboard</a>
             <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>
         <div class="m-5" style="width:68%;">
@@ -395,7 +390,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         });
 
-        //added new
         // Update leaderboard on dropdown change
         function updateLeaderboard() {
             const mode = modeSelect.value;
@@ -409,7 +403,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             //submit the form to handle the filtering logic
             document.getElementById("myForm").submit();
-
         }
 
         // Attach event listeners to the dropdowns
