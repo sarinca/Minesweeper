@@ -37,15 +37,14 @@ restore_error_handler();
         if (empty($results)) {
             // user not found
             $message = "<p class='alert alert-danger'>User not found. Please register an account.</p>";
-            //include("login.php");
-            // return;
+            
         } else {
             // check if the password is correct
             $hashed_password = $results["password"];
             $correct = password_verify($_POST["password"], $hashed_password);
             if ($correct) {
                 // success!
-                $_SESSION["user_id"] = $results['id'];
+                $_SESSION["user_id"] = $results['userId'];
                 $_SESSION["username"] = $_POST["username"];
                 $_SESSION["email"] = $results['email'];
 
@@ -60,23 +59,19 @@ restore_error_handler();
                 }
 
                 // redirect to profile screen (set to shop for now to test)
-                header("Location: shop.php");
+                header("Location: profile.php");
                 exit;
-                // return;
+                
             } else {
                 // incorrect password
                 $message = "<p class='alert alert-danger'>Incorrect password. Please try again.</p>";
-                // $this->showLogin($message, "");
-                //include("login.php");
-                // return;
+                
             }
         }
         } else {
             // form submitted with missing fields
             $message = "<p class='alert alert-danger'>Username or password missing.</p>";
-            // $this->showLogin($message, "");
-            //include("login.php");
-            // return;
+            
         }
     }
 
@@ -85,8 +80,6 @@ restore_error_handler();
         $savedUsername = $_COOKIE["remembered_user"];
     }
 
-    // $this->showLogin("", $savedUsername);
-    //include("login.php");
 ?>
 
 <!DOCTYPE html>
@@ -163,12 +156,6 @@ restore_error_handler();
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link active" href="login.php">Login</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="?command=play">Play</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="leaderboard.php">Leaderboard</a>
                                 </li>
                             </ul>
                         </div>
