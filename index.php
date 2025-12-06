@@ -159,20 +159,19 @@ restore_error_handler();
         <div class="m-5" style="width:68%;">
             <h2 class="mb-4"> How to Play!</h2>
             <div style="display:flex; justify-content: center;">
-                <img src="./images/how_to_play_2.jpg">
+                <img src="./images/how_to_play_3.jpg" height="475">
             </div>
             <?php
             if ($user_loggedIn == true) {
                 //display a button that says play game
                 //NOTE: we need to change this link so that we can link it to the game page
                 echo '<div style = "display:flex; justify-content: center;">
-                <a class="btn loginbtn rounded-pill" href="index.php">Start a game!</a>
+                <a class="btn loginbtn rounded-pill mt-3" href="index.php">Start a game!</a>
                 </div>';
             } else {
                 //log in to play!
-            
                 echo '<div style = "display:flex; justify-content: center;">
-                <a class="btn loginbtn rounded-pill" href="login.php">Login to play a game!</a>
+                <a class="btn loginbtn rounded-pill mt-3" href="login.php">Login to play a game!</a>
                 </div>';
             }
             ?>
