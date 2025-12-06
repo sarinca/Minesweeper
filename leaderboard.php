@@ -143,6 +143,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="styles.css">
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
+
+        body {
+            overflow: hidden;
+        }
+
         tr.table-warning {
             --bs-table-bg: #FFE9B1 !important;
             /* Light Yellow */
@@ -212,6 +218,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             background-color: #fbe9af;
             border-left-color: #ffc562;
         }
+
+        #page-title{
+            text-align: center;
+            font-family: 'Inder', sans-serif;
+            font-weight: bolder;
+            font-size: 36px;
+            background-color: #ffc562;
+            padding: 20px;
+            border-radius: 15px;
+        }
     </style>
 </head>
 
@@ -255,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>
         <div class="m-5" style="width:68%;">
-            <h2 class="mb-5"> Leaderboard </h2>
+            <h2 class="mb-5" id="page-title"> Leaderboard </h2>
             <form method="post" id="myForm" action="<?php $_SERVER['PHP_SELF'] ?>">
                 <div style="display: flex; flex-direction: row;">
                     <select id="modeSelect" name="modeSelect" class="form-select m-2">

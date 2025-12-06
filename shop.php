@@ -87,6 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="styles.css">
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
+
         .btn-success {
             --bs-btn-bg: #76b881;
             --bs-btn-border-color: #bae0bd;
@@ -143,6 +145,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             background-color: #fbe9af;
             border-left-color: #ffc562;
         }
+
+        #page-title{
+            text-align: center;
+            font-family: 'Inder', sans-serif;
+            font-weight: bolder;
+            font-size: 36px;
+            background-color: #ffc562;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        #available-points {
+            font-family: 'Inder', sans-serif;
+            text-align: right; 
+            font-size: 12px;
+
+            margin: auto;
+            font-size: 12px;
+            background-color: #dce8f2ff;
+            padding: 25px;
+            width: fit-content;
+            margin-bottom: 15px;
+            margin-right: 75px;
+            border-radius: 15px;
+        }
+
     </style>
 </head>
 
@@ -184,8 +212,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a class="nav-link active" href="shop.php" tabindex="-1">Shop</a>
         </ul>
         <div class="m-5" style="width:68%;">
-            <h2 class="mb-4"> Shop </h2>
-            <h4 style="text-align: right; margin-bottom: 40px;">Available points: <?php echo $user_points ?></h4>
+            <h2 class="mb-4" id="page-title"> Shop </h2>
+            <h4 id = "available-points">Available points: <?php echo $user_points ?></h4>
             <div class="justify-content-center" style="flex-direction:row; display: flex; flex-wrap: wrap;">
                 <?php foreach ($shop_items as $item):
                     $itemId = str_replace(' ', '', $item['name']) . "card";

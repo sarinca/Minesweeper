@@ -52,6 +52,11 @@ restore_error_handler();
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
+
+        body {
+            overflow: hidden;
+        }
         .btn-primary {
             --bs-btn-bg: #7ba1f5;
             --bs-btn-border-color: #82a1e5;
@@ -106,6 +111,21 @@ restore_error_handler();
             background-color: #fbe9af;
             border-left-color: #ffc562;
         }
+
+        .instructions {
+            height: 400px;
+            
+        }
+
+        #howToPlay{
+            text-align: center;
+            font-family: 'Inder', sans-serif;
+            font-weight: bolder;
+            font-size: 36px;
+            background-color: #ffc562;
+            padding: 20px;
+            border-radius: 15px;
+        }
     </style>
 </head>
 
@@ -157,9 +177,9 @@ restore_error_handler();
             } ?>
         </ul>
         <div class="m-5" style="width:68%;">
-            <h2 class="mb-4"> How to Play!</h2>
+            <h2 class="mb-4" id="howToPlay"> How to Play!</h2>
             <div style="display:flex; justify-content: center;">
-                <img src="./images/how_to_play_3.jpg" height="475">
+                <img class="instructions" src="./images/how_to_play_3.jpg">
             </div>
             <?php
             if ($user_loggedIn == true) {

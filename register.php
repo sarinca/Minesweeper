@@ -108,6 +108,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- href="../styles.css" -->
     <link rel="stylesheet" href="styles.css">
     <style>
+        body {
+            overflow: hidden;
+        }
+
         .navbar {
             position: relative !important;
         }
