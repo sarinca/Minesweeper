@@ -71,7 +71,7 @@ restore_error_handler();
                             '</button>
 
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                                <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                                 <li> <hr class="dropdown-divider"> </li>
                                 <li><a class="dropdown-item" href="login.php">Logout</a></li>
                             </ul>';
