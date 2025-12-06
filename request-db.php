@@ -1,25 +1,25 @@
 <?php
 require('connect-db.php');
 
-var_dump($_SERVER['REQUEST_METHOD'], $_POST['action']);
+// var_dump($_SERVER['REQUEST_METHOD'], $_POST['action']);
 // detect action for updating game state w/o reloading page
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameState') {
-    echo "updating game state...";
+    // echo "updating game state...";
     updateGameState($_POST['gameId'], $_POST['game_state'], $_POST['state_status']);
     exit();
 } 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updatePoints') {
-    echo "updating points...";
+    // echo "updating points...";
     updatePoints($_POST['gameId'], $_POST['mode']);
     exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameTime') {
-    echo "updating game time...";
+    // echo "updating game time...";
     updateGameTime($_POST['gameId'], $_POST['gameTime']);
     exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'addLeaderboardEntry') {
-    echo "adding leaderboard entry...";
+    // echo "adding leaderboard entry...";
     addLeaderboardEntry($_POST['gameId']);
     exit();
 }
@@ -528,12 +528,24 @@ function addNewGame($currUsername, $gameInfo){
     $state_boxesClicked = implode("", $boxesClicked);
     $state_bombPlacement = implode("", $bombPlacement);
 
-    $userId = $currUsername; // currently doesnt work but i think thats bc defaultUser doesnt have an actual userId?
+    echo "current username: " . $currUsername;
+
+    $username = $currUsername; // currently doesnt work but i think thats bc defaultUser doesnt have an actual userId?
 
     $gameTime = 0;
     echo "querying...";
 
     try{
+
+        $query1 = "SELECT userId FROM profile WHERE username = :username";
+        $statement1 = $db->prepare($query1);
+        $statement1->bindValue(':username', $username);
+        $statement1->execute();
+        $userData = $statement1->fetch();
+        $statement1->closeCursor();
+
+        $userId = $userData['userId'];
+
 
         $query = "INSERT INTO game (
         userId, 

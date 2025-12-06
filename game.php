@@ -2,6 +2,8 @@
 require('connect-db.php');    
 require('request-db.php');
 
+session_start();
+
 $gameId = $_GET['gameId'];
 
 $gameInfo = getGameInfo($gameId);
@@ -141,7 +143,7 @@ $width = $gamemodeInfo['width'];
 
     <div class="nav flex-row">
         <ul class="vertical-nav">
-            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="index.php">Home</a>
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
             <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
             or disable them? -->
