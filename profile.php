@@ -489,6 +489,92 @@ $userInventory = getUserInventory($user_id);
             margin: 0.5rem 0;
             font-size: 0.9rem;
         }
+
+        /* FRIEND CSS */
+        .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .friend-item {
+            background-color: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .friend-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: #ffc562;
+        }
+
+        .friend-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-bottom: 0.5rem;
+        }
+
+        .friend-name {
+            font-weight: bold;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        /* GAME CSS */
+        .game-history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .game-item {
+            background-color: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .game-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: #ffc562;
+        }
+
+        .game-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-mode {
+            font-weight: bold;
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+            color: #000;
+        }
+
+        .game-status {
+            color: #666;
+            margin: 0.3rem 0;
+            font-size: 0.9rem;
+        }
+
+        .game-time,
+        .game-score {
+            color: #666;
+            margin: 0.3rem 0;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 
@@ -607,6 +693,7 @@ $userInventory = getUserInventory($user_id);
         <div class="accordion mt-4" id="dashboardAccordion">
 
             <!-- Game History Accordion Item -->
+            <!-- Game History Accordion Item -->
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -615,25 +702,30 @@ $userInventory = getUserInventory($user_id);
                     </button>
                 </h2>
                 <div id="collapseGameHistory" class="accordion-collapse collapse" data-bs-parent="#dashboardAccordion">
-                    <div class="accordion-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Game ID</th>
-                                    <th>Mode</th>
-                                    <th>Status</th>
-                                    <th>Time</th>
-                                    <th>Score</th>
-                                    <th>Delete?</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <div class="accordion-body" style="padding: 2rem;">
+                        <?php if (empty($gameHistory)): ?>
+                            <p class="text-center text-muted">No games played yet. Start playing to build your history!</p>
+                        <?php else: ?>
+                            <div class="game-history-grid">
                                 <?php foreach ($gameHistory as $game): ?>
-                                    <tr>
-                                        <td><?php echo $game['gameId'] ?? 'N/A'; ?></td>
-                                        <td><?php echo $game['mode'] ?? 'N/A'; ?></td>
-                                        <td><?php echo $game['state_status'] ?? 'N/A'; ?></td>
-                                        <td>
+                                    <?php
+                                    // Determine which image to use based on game status
+                                    $status = strtolower($game['state_status'] ?? '');
+                                    if ($status === 'win') {
+                                        $gameImage = 'images/finished_game.png';
+                                    } elseif ($status === 'loss' || $status === 'lose') {
+                                        $gameImage = 'images/finished_game2.png';
+                                    } else {
+                                        $gameImage = 'images/in_progress.png';
+                                    }
+                                    ?>
+                                    <div class="game-item">
+                                        <img src="<?php echo $gameImage; ?>" alt="Game Status" class="game-image">
+                                        <h6 class="game-mode"><?php echo htmlspecialchars($game['mode'] ?? 'N/A'); ?></h6>
+                                        <p class="game-status">Status:
+                                            <strong><?php echo htmlspecialchars($game['state_status'] ?? 'N/A'); ?></strong></p>
+                                        <p class="game-time">
+                                            Time:
                                             <?php
                                             if (!empty($game['gameTime'])) {
                                                 $seconds = $game['gameTime'];
@@ -644,19 +736,17 @@ $userInventory = getUserInventory($user_id);
                                                 echo 'N/A';
                                             }
                                             ?>
-                                        </td>
-                                        <td><?php echo $game['score'] ?? 'N/A'; ?></td>
-                                        <td>
-                                            <form method="post">
-                                                <input type="hidden" name="game_id" value="<?php echo $game['gameId']; ?>">
-                                                <input type="submit" name="deleteGameBtn" class="btn btn-danger btn-sm"
-                                                    value="Delete">
-                                            </form>
-                                        </td>
-                                    </tr>
+                                        </p>
+                                        <p class="game-score">Score: <?php echo $game['score'] ?? 'N/A'; ?></p>
+                                        <form method="post" style="margin: 0;">
+                                            <input type="hidden" name="game_id" value="<?php echo $game['gameId']; ?>">
+                                            <input type="submit" name="deleteGameBtn" class="btn btn-danger btn-sm"
+                                                value="Delete">
+                                        </form>
+                                    </div>
                                 <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -674,37 +764,40 @@ $userInventory = getUserInventory($user_id);
                                         <input type="search" class="four" id="friendSearch"
                                             placeholder="Search users..." onclick="event.stopPropagation()" />
                                     </div>
-                                    <!-- <div class="stick"></div> -->
                                 </div>
                             </div>
                         </label>
                     </button>
                 </h2>
                 <div id="collapseFriendsList" class="accordion-collapse collapse" data-bs-parent="#dashboardAccordion">
-                    <div class="accordion-body">
+                    <div class="accordion-body" style="padding: 2rem;">
                         <!-- Search Results -->
                         <div id="searchResults"></div>
 
                         <hr>
 
                         <!-- Current Friends List -->
-                        <table class="table">
-                            <tbody>
+                        <?php if (empty($userFriends)): ?>
+                            <p class="text-center text-muted">No friends yet. Search for users to add friends!</p>
+                        <?php else: ?>
+                            <div class="friends-grid">
                                 <?php foreach ($userFriends as $friend): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($friend['friend_username']); ?></td>
-                                        <td>
-                                            <form method="post">
-                                                <input type="hidden" name="friend_id"
-                                                    value="<?php echo $friend['friend_id']; ?>">
-                                                <input type="submit" name="deleteFriendBtn" class="btn btn-danger btn-sm"
-                                                    value="Remove Friend">
-                                            </form>
-                                        </td>
-                                    </tr>
+                                    <div class="friend-item">
+                                        <img src="<?php echo !empty($friend['profilePicture_path'])
+                                            ? htmlspecialchars($friend['profilePicture_path'])
+                                            : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>"
+                                            alt="<?php echo htmlspecialchars($friend['friend_username']); ?>"
+                                            class="friend-image rounded-circle">
+                                        <h6 class="friend-name"><?php echo htmlspecialchars($friend['friend_username']); ?></h6>
+                                        <form method="post" style="margin: 0;">
+                                            <input type="hidden" name="friend_id" value="<?php echo $friend['friend_id']; ?>">
+                                            <input type="submit" name="deleteFriendBtn" class="btn btn-danger btn-sm"
+                                                value="Remove">
+                                        </form>
+                                    </div>
                                 <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

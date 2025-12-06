@@ -362,14 +362,14 @@ function getUserFriends($user_id) {
     global $db;
 
     $query = "
-        SELECT p.userId AS friend_id, p.username AS friend_username
+        SELECT p.userId AS friend_id, p.username AS friend_username, p.profilePicture_path
         FROM friends f
         JOIN profile p ON p.userId = f.userIdTwo
         WHERE f.userIdOne = :userId
 
         UNION
 
-        SELECT p.userId AS friend_id, p.username AS friend_username
+        SELECT p.userId AS friend_id, p.username AS friend_username, p.profilePicture_path
         FROM friends f
         JOIN profile p ON p.userId = f.userIdOne
         WHERE f.userIdTwo = :userId
