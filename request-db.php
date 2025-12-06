@@ -50,6 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updatePoints'
     updatePoints($_POST['gameId'], $_POST['mode']);
     exit();
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameTime') {
+    echo "updating game time...";
+    updateGameTime($_POST['gameId'], $_POST['gameTime']);
+    exit();
+}
 
 // -------------------- REGISTER FUNCTIONS -------------------- //
 function check_registration($email, $username) {
@@ -449,7 +454,7 @@ function addNewGame($currUsername, $gameInfo){
     $state_boxesClicked = implode("", $boxesClicked);
     $state_bombPlacement = implode("", $bombPlacement);
 
-    $userId = 1;//$currUsername; // currently doesnt work but i think thats bc defaultUser doesnt have an actual userId?
+    $userId = 8;//$currUsername; // currently doesnt work but i think thats bc defaultUser doesnt have an actual userId?
 
     $gameTime = 0;
     echo "querying...";
@@ -614,8 +619,24 @@ function updatePoints($gameId, $mode){
     }
 }
 
-function updateGameTime(){
+function updateGameTime($gameId, $gameTime){
+    global $db;
 
+    try {
+        $query = "UPDATE game SET gameTime = :gameTime WHERE gameId = :gameId";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':gameId', $gameId);
+        $statement->bindValue(':gameTime', $gameTime);
+        $statement->execute();
+        $statement->closeCursor();
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
 }
 
 

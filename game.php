@@ -8,6 +8,7 @@ $gameInfo = getGameInfo($gameId);
 $mode = $gameInfo['mode'];
 $bombs = $gameInfo['state_bombPlacement'];
 $game_state = $gameInfo['state_boxesClicked'];
+$gameTime = $gameInfo['gameTime'];
 
 $stateInfo = getGameStateInfo($gameId);
 
@@ -35,6 +36,7 @@ $width = $gamemodeInfo['width'];
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
         #board {
@@ -77,6 +79,30 @@ $width = $gamemodeInfo['width'];
         .mine-6 { color: cyan; }
         .mine-7 { color: purple; }
         .mine-8 { color: gray; }
+        #top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;  /* Timer left, mines right */
+            align-items: center;
+            padding: 10px 20px;
+            box-sizing: border-box;
+        }
+        #timer, #mine-counter {
+            display: inline-block;
+            align-self: flex-start; 
+            height: auto;
+            vertical-align: middle;
+            font-family: "Press Start 2P", monospace;
+            font-size: 22px;
+            color: #222;
+            padding: 8px 14px;
+            background: #ffe9a3;
+            border: 3px solid #b38b1e;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            margin-left: 75px;
+            margin-top: 20px;
+        }
         .navbar {
             position: relative !important;
         }
@@ -121,302 +147,352 @@ $width = $gamemodeInfo['width'];
             or disable them? -->
             <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>
-        <div id="game-area">
-            <div id="board"></div>
 
-            <script>
-                const gameId = <?php echo $gameId; ?>;
-                const height = <?php echo $height; ?>;
-                const width = <?php echo $width; ?>;
-                let state_status = "<?php echo $stateInfo['state_status']; ?>";
-                // alert("Game status1: " + state_status);
+        <div class="game-wrapper">
+            <div id="top-bar">
+                <span id="timer">000</span>
+                <span id="mine-counter">
+                    <?php 
+                        $totalMines = substr_count($bombs, '1');
+                        echo str_pad($totalMines, 3, '0', STR_PAD_LEFT); 
+                    ?>
+                </span>
+            </div>
+            <div id="game-area">
+                <div id="board"></div>
 
-                const game_state = <?php echo json_encode(str_split($game_state)); ?>;
-                const bombs = <?php echo json_encode(str_split($bombs)); ?>;
+                <script>
+                    const gameId = <?php echo $gameId; ?>;
+                    const height = <?php echo $height; ?>;
+                    const width = <?php echo $width; ?>;
+                    let state_status = "<?php echo $stateInfo['state_status']; ?>";
+                    // alert("Game status1: " + state_status);
 
-                const board = document.getElementById("board");
+                    const game_state = <?php echo json_encode(str_split($game_state)); ?>;
+                    const bombs = <?php echo json_encode(str_split($bombs)); ?>;
 
-                for (let row = 0; row < height; row++) {
-                    for (let col = 0; col < width; col++) {
-                        const index = row * width + col;
-                        const isClicked = game_state[index] === '1';
-                        const isBomb = bombs[index] === '1';
+                    // var totalMines = substr_count($bombs, '1');
+                    // document.getElementById("mine-counter").textContent =
+                    //     String(totalMines).padStart(3, '0');
 
-                        const cell = document.createElement("div");
-                        cell.classList.add("cell");
+                    const board = document.getElementById("board");
 
-                        cell.dataset.row = row;
-                        cell.dataset.col = col;
+                    var displayTimer = null;
+                    var elapsedSeconds = <?php echo $gameTime; ?>;
+                    var displayPaused = false;
 
-                        if (isClicked) {
-                            cell.classList.add("clicked");
-                            if (isBomb) {
-                                cell.textContent = "💣";
-                            } else {
-                                let mineCount = 0;
-                                mineCount += countSurroundingMines(row, col)
+                    const totalMines = <?php echo substr_count($bombs, '1'); ?>;
 
-                                cell.textContent = mineCount > 0 ? mineCount : ""; // if no adjacent mines, leave blank, otherwise show count
+                    for (let row = 0; row < height; row++) {
+                        for (let col = 0; col < width; col++) {
+                            const index = row * width + col;
+                            const isClicked = game_state[index] === '1';
+                            const isBomb = bombs[index] === '1';
 
-                                cell.classList.remove(
-                                    "mine-1","mine-2","mine-3","mine-4",
-                                    "mine-5","mine-6","mine-7","mine-8"
-                                );
+                            const cell = document.createElement("div");
+                            cell.classList.add("cell");
 
-                                if (mineCount > 0) {
-                                    cell.classList.add("mine-" + mineCount);
+                            cell.dataset.row = row;
+                            cell.dataset.col = col;
+
+                            if (isClicked) {
+                                cell.classList.add("clicked");
+                                if (isBomb) {
+                                    cell.textContent = "💣";
+                                } else {
+                                    let mineCount = 0;
+                                    mineCount += countSurroundingMines(row, col)
+
+                                    cell.textContent = mineCount > 0 ? mineCount : ""; // if no adjacent mines, leave blank, otherwise show count
+
+                                    cell.classList.remove(
+                                        "mine-1","mine-2","mine-3","mine-4",
+                                        "mine-5","mine-6","mine-7","mine-8"
+                                    );
+
+                                    if (mineCount > 0) {
+                                        cell.classList.add("mine-" + mineCount);
+                                    }
                                 }
                             }
-                        }
 
-                        board.appendChild(cell);
+                            board.appendChild(cell);
+                        }
                     }
-                }
 
-                const cells = document.querySelectorAll(".cell");
-                
-                cells.forEach(cell => {
+                    // document.getElementById("mine-counter").textContent = String(totalMines - flagsPlaced).padStart(3, '0');
 
-                    // left click (javascript is so weird guys)
-                    cell.addEventListener("click", () => {
-                        const row = parseInt(cell.dataset.row);
-                        const col = parseInt(cell.dataset.col);
-                        const index = row * width + col;
-                        // state_status = "<?php echo $stateInfo['state_status']; ?>";
-                        // alert(state_status === "WIN" || state_status === "LOSE");
+                    const cells = document.querySelectorAll(".cell");
 
-                        if (cell.classList.contains("flagged")) {
-                            return; // Ignore clicks on flagged cells
-                        }
-                        if (cell.classList.contains("clicked")) {
-                            return; // Ignore clicks on already clicked cells
-                        }
-                        // alert("status 2 = " + state_status);
-                        if (state_status === "WIN" || state_status === "LOSE") {
-                            // alert("Game is already over!: " + state_status);
-                            return; // Ignore clicks if game is over
-                        }
-                        // alert("after status checks");
+                    var gameStarted = false;
 
-                        // mark cell as clicked
-                        // cell.classList.add("clicked");
-                        // game_state[index] = '1';
-                        // alert("Clicked cell");
+                    
+                    cells.forEach(cell => {
 
-                        if (bombs[index] === '1') {
-                            cell.classList.add("clicked");
-                            game_state[index] = '1';
-                            cell.textContent = "💣";
-                            revealMines(); //   
-                            // alert("1Game Over! You clicked on a mine. " + state_status);
-                            state_status = "LOSE"; //
-                            // return;
-                            // alert("status = 3 " + state_status);
-                            // return;
-                        } else {
-                            // alert("Checking mines");
-                            checkMine(row, col); // IMPLEMENTED
-                            state_status = checkWin(); 
-                            // alert("After checkWin, status = " + state_status);
-                            // Here you would calculate the number of adjacent bombs
-                            //cell.textContent = mineCount or smth;
-                        }
-                        // alert("status = 4 " + state_status);
+                        // left click (javascript is so weird guys)
+                        cell.addEventListener("click", () => {
+                            const row = parseInt(cell.dataset.row);
+                            const col = parseInt(cell.dataset.col);
+                            const index = row * width + col;
 
-                        updateDB(game_state, state_status, "<?php echo $mode; ?>"); 
-                        return;
+                            if (!gameStarted) {
+                                gameStarted = true;
+                                startDisplayTimer();
+                                alert("Timer started!");
+                            }
+
+                            if (cell.classList.contains("flagged")) {
+                                return; // Ignore clicks on flagged cells
+                            }
+                            if (cell.classList.contains("clicked")) {
+                                return; // Ignore clicks on already clicked cells
+                            }
+                            if (state_status === "WIN" || state_status === "LOSE") {
+                                return; // Ignore clicks if game is over
+                            }
+
+
+                            if (bombs[index] === '1') {
+                                cell.classList.add("clicked");
+                                game_state[index] = '1';
+                                cell.textContent = "💣";
+                                revealMines();   
+                                state_status = "LOSE"; 
+                                clearInterval(displayTimer);
+
+                            } else {
+                                checkMine(row, col); 
+                                state_status = checkWin(); 
+                                if (state_status === "WIN") {
+                                    clearInterval(displayTimer);
+                                }
+                            }
+                            // alert("status = 4 " + state_status);
+
+                            updateDB(game_state, state_status, "<?php echo $mode; ?>"); 
+                            return;
+                        });
+
+                        // right click (works perfect make NO edits :D)
+                        cell.addEventListener("contextmenu", (e) => {
+                            e.preventDefault(); //removed the default context menu
+                            
+                            if (cell.classList.contains("clicked")) {
+                                return; // Ignore right-clicks on already clicked cells
+                            }
+
+
+                            if (cell.classList.contains("flagged")) {
+                                cell.classList.remove("flagged");
+                                cell.textContent = ""; // unflag
+                                // document.getElementById("mine-counter").textContent = String(totalMines - flagsPlaced).padStart(3, '0');
+                            } else {
+                                cell.classList.add("flagged");
+                                cell.textContent = "🚩"; // flag
+                                // document.getElementById("mine-counter").textContent = String(totalMines - flagsPlaced).padStart(3, '0');
+                            }
+                        });
+
                     });
 
-                    // right click (works perfect make NO edits :D)
-                    cell.addEventListener("contextmenu", (e) => {
-                        e.preventDefault(); //removed the default context menu
-                        
-                        if (cell.classList.contains("clicked")) {
-                            return; // Ignore right-clicks on already clicked cells
-                        }
+                    function updateDB(game_state, state_status, mode) {
+                        const game_state_str = game_state.join('');
+                        // alert("Updating DB with state: " + game_state_str + " and status: " + state_status);
 
-                        if (cell.classList.contains("flagged")) {
-                            cell.classList.remove("flagged");
-                            cell.textContent = ""; // unflag
-                        } else {
-                            cell.classList.add("flagged");
-                            cell.textContent = "🚩"; // flag
-                        }
-                    });
-
-                });
-
-                function updateDB(game_state, state_status, mode) {
-                    const game_state_str = game_state.join('');
-                    // alert("Updating DB with state: " + game_state_str + " and status: " + state_status);
-
-                    fetch('request-db.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: `action=${encodeURIComponent('updateGameState')}` +
-                              `&gameId=${encodeURIComponent(gameId)}` +
-                              `&game_state=${encodeURIComponent(game_state_str)}` +
-                              `&state_status=${encodeURIComponent(state_status)}`
-                    })
-                    .then(response => response.text())
-                    .then(data => {
-                        // alert('Success: ' + data);
-                    })
-                    .catch((error) => {
-                        alert('Error: ' + error);
-                    });
-
-                    if (state_status === "LOSE" ){
-
-                    } else if (state_status === "WIN") {
-                        // alert("Updating points for game " + gameId + " mode " + mode);
                         fetch('request-db.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
                             },
-                            body: `action=${encodeURIComponent('updatePoints')}` +
+                            body: `action=${encodeURIComponent('updateGameState')}` +
                                 `&gameId=${encodeURIComponent(gameId)}` +
-                                `&mode=${encodeURIComponent(mode)}`
+                                `&game_state=${encodeURIComponent(game_state_str)}` +
+                                `&state_status=${encodeURIComponent(state_status)}`
                         })
                         .then(response => response.text())
                         .then(data => {
-                            // alert('Points updated: ' + data);
+                            // alert('Success: ' + data);
                         })
                         .catch((error) => {
-                            alert('Error updating points: ' + error);
+                            alert('Error: ' + error);
                         });
-                    } 
-                }
 
-                function checkWin() {
-                    // alert("Checking win condition");
-                    for (let i = 0; i < game_state.length; i++) {
-                        if (bombs[i] === '0' && game_state[i] === '0') {
-                            // alert("Found unclicked non-bomb cell, not a win yet");
-                            return "IN PROGRESS"; // found an unclicked non-bomb cell, not a win yet
-                        }
+                        alert("elapsed seconds: " + elapsedSeconds);
+
+                        fetch('request-db.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `action=${encodeURIComponent('updateGameTime')}` +
+                                `&gameId=${encodeURIComponent(gameId)}` +
+                                `&gameTime=${encodeURIComponent(elapsedSeconds)}`
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            // alert('Game time updated: ' + data);
+                        })
+                        .catch((error) => {
+                            alert('Error updating game time: ' + error);
+                        });
+
+                        if (state_status === "WIN") {
+                            // alert("Updating points for game " + gameId + " mode " + mode);
+                            fetch('request-db.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: `action=${encodeURIComponent('updatePoints')}` +
+                                    `&gameId=${encodeURIComponent(gameId)}` +
+                                    `&mode=${encodeURIComponent(mode)}`
+                            })
+                            .then(response => response.text())
+                            .then(data => {
+                                // alert('Points updated: ' + data);
+                            })
+                            .catch((error) => {
+                                alert('Error updating points: ' + error);
+                            });
+                        } 
                     }
-                    alert("All non-bomb cells clicked, you win!");
-                    // All non-bomb cells are clicked, player wins
-                    return "WIN"// updateDB(game_state, "WIN"); //   -- NOT YET IMPLEMENTED --
-                }
 
-                function revealMines() {  // the vscode ai made this before i could blink o.O
-                    // alert("Revealing all mines");
-                    for (let row = 0; row < height; row++) {
-                        for (let col = 0; col < width; col++) {
-                            const index = row * width + col;
-                            if (bombs[index] === '1') {
-                                const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-                                cell.classList.add("clicked");
-                                cell.textContent = "💣";
+                    function checkWin() {
+                        // alert("Checking win condition");
+                        for (let i = 0; i < game_state.length; i++) {
+                            if (bombs[i] === '0' && game_state[i] === '0') {
+                                // alert("Found unclicked non-bomb cell, not a win yet");
+                                return "IN PROGRESS"; // found an unclicked non-bomb cell, not a win yet
+                            }
+                        }
+                        // alert("All non-bomb cells clicked, you win!");
+                        // All non-bomb cells are clicked, player wins
+                        return "WIN"// updateDB(game_state, "WIN"); //   -- NOT YET IMPLEMENTED --
+                    }
+
+                    function startDisplayTimer() {
+                        displayTimer = setInterval(() => {
+                            if (!displayPaused) {
+                                elapsedSeconds++;
+                                document.getElementById("timer").textContent = String(elapsedSeconds).padStart(3, '0');
+                            }
+                        }, 1000);
+                    }
+
+                    function revealMines() {  // the vscode ai made this before i could blink o.O
+                        // alert("Revealing all mines");
+                        for (let row = 0; row < height; row++) {
+                            for (let col = 0; col < width; col++) {
+                                const index = row * width + col;
+                                if (bombs[index] === '1') {
+                                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                                    cell.classList.add("clicked");
+                                    cell.textContent = "💣";
+                                }
                             }
                         }
                     }
-                }
 
-                function countMine(row, col) {
-                    // alert("countMine called");
-                    if (row < 0 || row >= height || col < 0 || col >= width) {
-                        // alert("out of bounds count");
-                        return 0; // out of bounds
-                    }
-                    const index = row * width + col;
-                    if (bombs[index] === '1') {
-                        // alert("found mine count");
-                        return 1;
-                    }
-                    return 0;
-                }
-
-                function countSurroundingMines(row, col) { 
-                    let mineCount = 0;
-                    mineCount += countMine(row-1, col-1); // top left
-                    mineCount += countMine(row-1, col); // top middle
-                    mineCount += countMine(row-1, col+1); // top right
-
-                    // left and right
-                    mineCount += countMine(row, col-1);
-                    mineCount += countMine(row, col+1);
-
-                    // bottom 3
-                    mineCount += countMine(row+1, col-1); // bottom left
-                    mineCount += countMine(row+1, col); // bottom middle
-                    mineCount += countMine(row+1, col+1); // bottom right
-                    return mineCount;
-                }
-
-                // I HATE recursive functions T_T
-                function checkMine(row, col) {
-                    // alert("before bounds checks");
-                    // alert("checking cell at (" + row + ", " + col + ")");
-
-                    if (row < 0 || row >= height || col < 0 || col >= width) {
-                        // alert("out of bounds check");
-                        return; // out of bounds
-                    }
-                    // alert("after bounds checks");
-                    // alert("calculating index");
-                    const index = row * width + col;
-                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-
-                    if (bombs[index] === '1') {
-                        // alert("bomb check");
-                        return; // bomb :(
+                    function countMine(row, col) {
+                        // alert("countMine called");
+                        if (row < 0 || row >= height || col < 0 || col >= width) {
+                            // alert("out of bounds count");
+                            return 0; // out of bounds
+                        }
+                        const index = row * width + col;
+                        if (bombs[index] === '1') {
+                            // alert("found mine count");
+                            return 1;
+                        }
+                        return 0;
                     }
 
-                    if (cell.classList.contains("clicked")) {
-                        // alert("cell already clicked check");
-                        return; // already clicked
-                    }
-
-                    // Mark cell as clicked 
-                    cell.classList.add("clicked");
-                    game_state[index] = '1';
-
-                    // alert("counting adjacent mines");
-                    // count adjacent mines
-                    let mineCount = 0;
-                    mineCount += countSurroundingMines(row, col)
-
-                    // alert("marking mine count");
-
-                    cell.textContent = mineCount > 0 ? mineCount : ""; // if no adjacent mines, leave blank, otherwise show count
-
-                    cell.classList.remove(
-                        "mine-1","mine-2","mine-3","mine-4",
-                        "mine-5","mine-6","mine-7","mine-8"
-                    );
-
-                    // add class if mineCount > 0
-                    if (mineCount > 0) {
-                        cell.classList.add("mine-" + mineCount);
-                    }
-
-                    // if no adjacent mines, recursivley check neighbors
-                    // alert("recursivley checking neighbors");
-                    if (mineCount === 0) {
-                        checkMine(row-1, col-1); // top left
-                        checkMine(row-1, col); // top middle
-                        checkMine(row-1, col+1); // top right
+                    function countSurroundingMines(row, col) { 
+                        let mineCount = 0;
+                        mineCount += countMine(row-1, col-1); // top left
+                        mineCount += countMine(row-1, col); // top middle
+                        mineCount += countMine(row-1, col+1); // top right
 
                         // left and right
-                        checkMine(row, col-1);
-                        checkMine(row, col+1);
+                        mineCount += countMine(row, col-1);
+                        mineCount += countMine(row, col+1);
 
                         // bottom 3
-                        checkMine(row+1, col-1); // bottom left
-                        checkMine(row+1, col); // bottom middle
-                        checkMine(row+1, col+1); // bottom right
+                        mineCount += countMine(row+1, col-1); // bottom left
+                        mineCount += countMine(row+1, col); // bottom middle
+                        mineCount += countMine(row+1, col+1); // bottom right
+                        return mineCount;
                     }
 
-                }
-                
+                    // I HATE recursive functions T_T
+                    function checkMine(row, col) {
+                        // alert("before bounds checks");
+                        // alert("checking cell at (" + row + ", " + col + ")");
 
-            </script>
+                        if (row < 0 || row >= height || col < 0 || col >= width) {
+                            // alert("out of bounds check");
+                            return; // out of bounds
+                        }
+                        // alert("after bounds checks");
+                        // alert("calculating index");
+                        const index = row * width + col;
+                        const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+
+                        if (bombs[index] === '1') {
+                            // alert("bomb check");
+                            return; // bomb :(
+                        }
+
+                        if (cell.classList.contains("clicked")) {
+                            // alert("cell already clicked check");
+                            return; // already clicked
+                        }
+
+                        // Mark cell as clicked 
+                        cell.classList.add("clicked");
+                        game_state[index] = '1';
+
+                        // alert("counting adjacent mines");
+                        // count adjacent mines
+                        let mineCount = 0;
+                        mineCount += countSurroundingMines(row, col)
+
+                        // alert("marking mine count");
+
+                        cell.textContent = mineCount > 0 ? mineCount : ""; // if no adjacent mines, leave blank, otherwise show count
+
+                        cell.classList.remove(
+                            "mine-1","mine-2","mine-3","mine-4",
+                            "mine-5","mine-6","mine-7","mine-8"
+                        );
+
+                        // add class if mineCount > 0
+                        if (mineCount > 0) {
+                            cell.classList.add("mine-" + mineCount);
+                        }
+
+                        // if no adjacent mines, recursivley check neighbors
+                        // alert("recursivley checking neighbors");
+                        if (mineCount === 0) {
+                            checkMine(row-1, col-1); // top left
+                            checkMine(row-1, col); // top middle
+                            checkMine(row-1, col+1); // top right
+
+                            // left and right
+                            checkMine(row, col-1);
+                            checkMine(row, col+1);
+
+                            // bottom 3
+                            checkMine(row+1, col-1); // bottom left
+                            checkMine(row+1, col); // bottom middle
+                            checkMine(row+1, col+1); // bottom right
+                        }
+
+                    }
+                    
+
+                </script>
+            </div>
         </div>
     </div>
 
