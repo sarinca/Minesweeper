@@ -54,6 +54,9 @@ restore_error_handler();
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
 
+        body {
+            overflow: hidden;
+        }
         .btn-primary {
             --bs-btn-bg: #7ba1f5;
             --bs-btn-border-color: #82a1e5;
@@ -110,8 +113,8 @@ restore_error_handler();
         }
 
         .instructions {
-            height: 80%;
-            width: 80%;
+            height: 400px;
+            
         }
 
         #howToPlay{
@@ -176,7 +179,7 @@ restore_error_handler();
         <div class="m-5" style="width:68%;">
             <h2 class="mb-4" id="howToPlay"> How to Play!</h2>
             <div style="display:flex; justify-content: center;">
-                <img src="./images/how_to_play_3.jpg" height="475">
+                <img class="instructions" src="./images/how_to_play_3.jpg">
             </div>
             <?php
             if ($user_loggedIn == true) {
