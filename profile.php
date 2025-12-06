@@ -5,14 +5,14 @@ session_start();
 require_once('connect-db.php');
 require_once('request-db.php');
 
-$user_id = 1;
+// $user_id = 1;
 
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: login.php");
-//     exit();
-// }
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 
-// $user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'];
 
 if (isset($_GET['search_users'])) {
     header('Content-Type: application/json');
