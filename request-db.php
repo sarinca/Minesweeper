@@ -121,7 +121,7 @@ function register($email, $username, $password) {
 
 function login($username) {
     global $db;
-    $query = "SELECT * FROM user WHERE username = :username";
+    $query = "SELECT * FROM user NATURAL JOIN profile WHERE username = :username";
     $statement = $db->prepare($query);
     $statement->bindValue(':username', $username);
     $statement->execute();
@@ -320,26 +320,33 @@ function timeFiltering($entries, $timeMax){
 function getUserStats($user_id) {
     global $db;
 
-    $query = "SELECT username, totalScore 
+    $query = "SELECT userId,
+                     username,
+                     points,
+                     totalScore,
+                     COALESCE(profilePicture_path, '') AS profilePicture_path
               FROM profile
               WHERE userId = :userId";
 
     $statement = $db->prepare($query);
     $statement->bindValue(':userId', $user_id);
     $statement->execute();
-    $results = $statement->fetch();
+    $results = $statement->fetch(PDO::FETCH_ASSOC);
     $statement->closeCursor();
     return $results;
 }
 
 
+
 function getGamesPlayed($user_id) {
     global $db;
 
-    $query = "SELECT COUNT(*) AS games_played, 
-                     MIN(gameTime) AS fastest_time 
-              FROM game
-              WHERE userId = :userId";
+    $query = "SELECT 
+                COUNT(*) AS games_played, 
+                MIN(CASE WHEN s.state_status = 'WIN' THEN g.gameTime ELSE NULL END) AS fastest_time 
+              FROM game g
+              LEFT JOIN state s ON g.gameId = s.gameId
+              WHERE g.userId = :userId";
 
     $statement = $db->prepare($query);
     $statement->bindValue(':userId', $user_id);
@@ -352,14 +359,25 @@ function getGamesPlayed($user_id) {
 function getGameHistory($user_id) {
     global $db;
 
-    $query = "SELECT *
-              FROM game
-              WHERE userId = :userId";
+    $query = "SELECT 
+                g.gameId,
+                g.gameTime,
+                g.mode,
+                s.state_status,
+                CASE 
+                    WHEN s.state_status = 'WIN' THEN gm.points
+                    ELSE 0
+                END AS score
+              FROM game g
+              LEFT JOIN state s ON g.gameId = s.gameId
+              LEFT JOIN gamemode gm ON g.mode = gm.mode
+              WHERE g.userId = :userId
+              ORDER BY g.gameId DESC";
 
     $statement = $db->prepare($query);
     $statement->bindValue(':userId', $user_id);
     $statement->execute();
-    $results = $statement->fetchAll();
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
     $statement->closeCursor();
     return $results;
 }
@@ -368,14 +386,14 @@ function getUserFriends($user_id) {
     global $db;
 
     $query = "
-        SELECT p.userId AS friend_id, p.username AS friend_username
+        SELECT p.userId AS friend_id, p.username AS friend_username, p.profilePicture_path
         FROM friends f
         JOIN profile p ON p.userId = f.userIdTwo
         WHERE f.userIdOne = :userId
 
         UNION
 
-        SELECT p.userId AS friend_id, p.username AS friend_username
+        SELECT p.userId AS friend_id, p.username AS friend_username, p.profilePicture_path
         FROM friends f
         JOIN profile p ON p.userId = f.userIdOne
         WHERE f.userIdTwo = :userId
@@ -420,6 +438,93 @@ function deleteGame($game_id) {
     return $success;
 }
 
+function updateProfile($user_id, $post) {
+    global $db;
+    
+    if (!empty($post['username'])) {
+        $query = "SELECT username FROM profile WHERE userId = :userId";
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':userId', $user_id);
+        $stmt->execute();
+        $currentUsername = $stmt->fetchColumn();
+        $stmt->closeCursor();
+        
+        // update user table (WE HAVE CASCADE TO UPDATE PROFILE TABLE)
+        $query = "UPDATE user SET username = :newUsername WHERE username = :currentUsername";
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':newUsername', $post['username']);
+        $stmt->bindValue(':currentUsername', $currentUsername);
+        $stmt->execute();
+        $stmt->closeCursor();
+    }
+    
+    if (!empty($post['pfp_url']) && filter_var($post['pfp_url'], FILTER_VALIDATE_URL)) {
+        $query = "UPDATE profile SET profilePicture_path = :path WHERE userId = :userId";
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':path', $post['pfp_url']);
+        $stmt->bindValue(':userId', $user_id);
+        $stmt->execute();
+        $stmt->closeCursor();
+    }
+}
+
+function searchUsers($user_id, $query) {
+    global $db;
+    
+    if (strlen($query) < 2) {
+        return [];
+    }
+    
+    // Search for users, excluding current user and existing friends
+    $sql = "SELECT p.userId, p.username 
+            FROM profile p
+            WHERE p.username LIKE :query
+            AND p.userId != :current_user
+            AND p.userId NOT IN (
+                SELECT userIdTwo FROM friends WHERE userIdOne = :current_user
+                UNION
+                SELECT userIdOne FROM friends WHERE userIdTwo = :current_user
+            )
+            LIMIT 10";
+    
+    $stmt = $db->prepare($sql);
+    $stmt->bindValue(':query', '%' . $query . '%');
+    $stmt->bindValue(':current_user', $user_id);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+    
+    return $results;
+}
+
+function addFriend($user_id, $friend_id) {
+    global $db;
+    
+    $query = "INSERT INTO friends (userIdOne, userIdTwo) VALUES (:user_id, :friend_id)";
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(':user_id', $user_id);
+    $stmt->bindValue(':friend_id', $friend_id);
+    $success = $stmt->execute();
+    $stmt->closeCursor();
+    
+    return $success;
+}
+
+function getUserInventory($user_id) {
+    global $db;
+    $query = "SELECT ii.itemId, ii.name, id.picPath as image_path, COUNT(b.itemId) as quantity
+              FROM itemInventory ii
+              JOIN itemDetails id ON ii.name = id.name
+              LEFT JOIN buys b ON ii.itemId = b.itemId AND b.userId = :user_id
+              WHERE b.userId = :user_id
+              GROUP BY ii.itemId, ii.name, id.picPath
+              ORDER BY ii.name";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':user_id', $user_id);
+    $statement->execute();
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
+}
+
 // ---------------------- GAME FUNCTIONS ---------------------- //
 
 function getGamemodeInfo($mode){
@@ -434,6 +539,7 @@ function getGamemodeInfo($mode){
     $statement->closeCursor();
     
     return $results;
+
 }
 
 function addNewGame($currUsername, $gameInfo){
@@ -677,3 +783,4 @@ function addLeaderboardEntry($gameId){
 }
 
 ?>
+

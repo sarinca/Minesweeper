@@ -40,6 +40,11 @@ body {
 .profile-dropdown {
     background-color: rgba(252, 245, 217);
     width: 100px;
+    margin-right: 80px;
+}
+
+.dropdown-menu {
+    margin-right: 50px;
 }
 
 #profile-select:hover {
@@ -57,20 +62,20 @@ body {
 
 /* ========== Shop + Leaderboard Styles ========== */
 div.shop-card {
-    background-color: #FFD788; 
-    height:280px; 
-    border-radius:20px;
-    padding:20px;
-    margin-left:20px;
-    margin-right:20px;
+    background-color: #FFD788;
+    height: 280px;
+    border-radius: 20px;
+    padding: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
     position: relative;
 }
 
 div.warning-text {
-    position: absolute; 
-    bottom: 0; 
-    margin-bottom: 10px; 
-    font-size:14px; 
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 10px;
+    font-size: 14px;
     margin-left: auto;
     margin-right: auto;
     left: 0;
@@ -150,7 +155,7 @@ a:hover {
 
 /* =========== form group coloring  =========== */
 .form-group .form-control {
-    background-color: #fbe9af; 
+    background-color: #fbe9af;
     border-color: #fbe9af;
 }
 
@@ -201,8 +206,9 @@ input[type="checkbox"]:enabled {
     justify-content: space-between;
 }
 
-#modeSelect, #friendSelect, #timeSelect {
-   border-radius: 14px;
-   border-color: white;
+#modeSelect,
+#friendSelect,
+#timeSelect {
+    border-radius: 14px;
+    border-color: white;
 }
-
