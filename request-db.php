@@ -55,6 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameTim
     updateGameTime($_POST['gameId'], $_POST['gameTime']);
     exit();
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'addLeaderboardEntry') {
+    echo "adding leaderboard entry...";
+    addLeaderboardEntry($_POST['gameId']);
+    exit();
+}
 
 // -------------------- REGISTER FUNCTIONS -------------------- //
 function check_registration($email, $username) {
@@ -622,6 +627,7 @@ function updatePoints($gameId, $mode){
 function updateGameTime($gameId, $gameTime){
     global $db;
 
+
     try {
         $query = "UPDATE game SET gameTime = :gameTime WHERE gameId = :gameId";
         $statement = $db->prepare($query);
@@ -639,5 +645,35 @@ function updateGameTime($gameId, $gameTime){
     }
 }
 
+function addLeaderboardEntry($gameId){
+    global $db;
+
+
+    try {
+
+        $query1 = "SELECT userId FROM game WHERE gameId = :gameId";
+        $statement1 = $db->prepare($query1);
+        $statement1->bindValue(':gameId', $gameId);
+        $statement1->execute();
+        $gameData = $statement1->fetch();
+        $statement1->closeCursor();
+
+        $userId = $gameData['userId'];
+
+        $query2 = "INSERT INTO leaderboardEntry (gameId, userId) VALUES (:gameId, :userId)";
+        $statement2 = $db->prepare($query2);
+        $statement2->bindValue(':gameId', $gameId);
+        $statement2->bindValue(':userId', $userId);
+        $statement2->execute();
+        $statement2->closeCursor();
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
+}
 
 ?>

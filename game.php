@@ -317,24 +317,25 @@ $width = $gamemodeInfo['width'];
                             alert('Error: ' + error);
                         });
 
-                        alert("elapsed seconds: " + elapsedSeconds);
+                        // alert("elapsed seconds: " + elapsedSeconds);
 
-                        fetch('request-db.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `action=${encodeURIComponent('updateGameTime')}` +
-                                `&gameId=${encodeURIComponent(gameId)}` +
-                                `&gameTime=${encodeURIComponent(elapsedSeconds)}`
-                        })
-                        .then(response => response.text())
-                        .then(data => {
-                            // alert('Game time updated: ' + data);
-                        })
-                        .catch((error) => {
-                            alert('Error updating game time: ' + error);
-                        });
+                        // update game time after each click
+                        // fetch('request-db.php', {
+                        //     method: 'POST',
+                        //     headers: {
+                        //         'Content-Type': 'application/x-www-form-urlencoded',
+                        //     },
+                        //     body: `action=${encodeURIComponent('updateGameTime')}` +
+                        //         `&gameId=${encodeURIComponent(gameId)}` +
+                        //         `&gameTime=${encodeURIComponent(elapsedSeconds)}`
+                        // })
+                        // .then(response => response.text())
+                        // .then(data => {
+                        //     // alert('Game time updated: ' + data);
+                        // })
+                        // .catch((error) => {
+                        //     alert('Error updating game time: ' + error);
+                        // });
 
                         if (state_status === "WIN") {
                             // alert("Updating points for game " + gameId + " mode " + mode);
@@ -353,6 +354,22 @@ $width = $gamemodeInfo['width'];
                             })
                             .catch((error) => {
                                 alert('Error updating points: ' + error);
+                            });
+
+                            fetch('request-db.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: `action=${encodeURIComponent('addLeaderboardEntry')}` +
+                                    `&gameId=${encodeURIComponent(gameId)}` 
+                            })
+                            .then(response => response.text())
+                            .then(data => {
+                                // alert('Leaderboard entry added: ' + data);
+                            })
+                            .catch((error) => {
+                                alert('Error adding leaderboard entry: ' + error);
                             });
                         } 
                     }
@@ -374,6 +391,24 @@ $width = $gamemodeInfo['width'];
                         displayTimer = setInterval(() => {
                             if (!displayPaused) {
                                 elapsedSeconds++;
+
+                                fetch('request-db.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                    },
+                                    body: `action=${encodeURIComponent('updateGameTime')}` +
+                                        `&gameId=${encodeURIComponent(gameId)}` +
+                                        `&gameTime=${encodeURIComponent(elapsedSeconds)}`
+                                })
+                                .then(response => response.text())
+                                .then(data => {
+                                    // alert('Game time updated: ' + data);
+                                })
+                                .catch((error) => {
+                                    alert('Error updating game time: ' + error);
+                                });
+
                                 document.getElementById("timer").textContent = String(elapsedSeconds).padStart(3, '0');
                             }
                         }, 1000);
