@@ -47,6 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         deleteGame($_POST['game_id']);
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
+    }  elseif (!empty($_POST['resumeGameBtn'])) {
+        // updating, navigate to header("Location: game.php?gameId=[gameId]"); 
+        // header("Location: " . $_SERVER['PHP_SELF']);
+        header("Location: game.php?gameId=" . $_POST['game_id']);
+        exit();
     } elseif (isset($_POST['updateProfileBtn'])) {
         updateProfile($user_id, $_POST);
         header("Location: " . $_SERVER['PHP_SELF']);
@@ -778,6 +783,11 @@ $userInventory = getUserInventory($user_id);
                                             <input type="hidden" name="game_id" value="<?php echo $game['gameId']; ?>">
                                             <input type="submit" name="deleteGameBtn" class="btn btn-danger btn-sm"
                                                 value="Delete">
+                                            <?php if ($status === "in progress"){
+                                                // create a resume game button
+                                                echo "<input type='submit' name='resumeGameBtn' class='btn btn-success btn-sm'
+                                                value='Resume'>";
+                                            }?>
                                         </form>
                                     </div>
                                 <?php endforeach; ?>
