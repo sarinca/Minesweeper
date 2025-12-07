@@ -58,7 +58,13 @@ $width = $gamemodeInfo['width'];
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
-                .vertical-nav {
+        @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
+
+        body {
+            overflow: hidden;
+        }
+
+        .vertical-nav {
             position: fixed;
             left: 0;
             top: 70px;
@@ -89,7 +95,7 @@ $width = $gamemodeInfo['width'];
             background-color: #fbe9af;
             border-left-color: #ffc562;
         }
-        
+
         .profile-dropdown {
             background-color: rgba(252, 245, 217);
             width: 100px;
@@ -128,14 +134,6 @@ $width = $gamemodeInfo['width'];
             line-height: 30px;
         }
 
-        #game-area {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin-left: 200px;
-        }
-
         .mine-1 {
             color: blue;
         }
@@ -168,14 +166,51 @@ $width = $gamemodeInfo['width'];
             color: gray;
         }
 
+        .game-wrapper {
+            flex: 1;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-template-rows: auto auto auto;
+            column-gap: 20px;
+            row-gap: 0px;
+            padding: 50px;
+        }
+
+        #page-name {
+            grid-column: 1 / -1;
+            grid-row: 1;
+            font-family: 'Inder', sans-serif;
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
         #top-bar {
-            width: 100%;
+            grid-column: 1;
+            grid-row: 2;
             display: flex;
-            justify-content: space-between;
-            /* Timer left, mines right */
+            gap: 30px;
             align-items: center;
-            padding: 10px 20px;
-            box-sizing: border-box;
+            align-self: start;
+        }
+
+        #game-area {
+            grid-column: 2;
+            grid-row: 2 / 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #inventory-items {
+            grid-column: 1;
+            grid-row: 3;
+            align-self: start;
+            padding: 15px;
+            background: #ffe9a3;
+            border: 3px solid #b38b1e;
+            border-radius: 4px;
+            font-size: 14px;
         }
 
         #timer,
@@ -192,8 +227,8 @@ $width = $gamemodeInfo['width'];
             border: 3px solid #b38b1e;
             letter-spacing: 2px;
             border-radius: 4px;
-            margin-left: 75px;
-            margin-top: 20px;
+            /* margin-left: 75px; */
+            /* margin-top: 20px; */
         }
 
         .navbar {
@@ -242,20 +277,29 @@ $width = $gamemodeInfo['width'];
         <ul class="vertical-nav">
             <a class="nav-link" href="index.php">Home</a>
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
-            <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
-            or disable them? -->
             <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>
 
         <div class="game-wrapper">
             <div id="top-bar">
-                <span id="timer">000</span>
-                <span id="mine-counter">
-                    <?php
-                    $totalMines = substr_count($bombs, '1');
-                    echo str_pad($totalMines, 3, '0', STR_PAD_LEFT);
-                    ?>
-                </span>
+                <div>
+                    <div style="font-size: 12px; margin-bottom: 5px; text-align: center;">Timer</div>
+                    <span id="timer">000</span>
+                </div>
+                <div>
+                    <div style="font-size: 12px; margin-bottom: 5px; text-align: center;">Mines</div>
+                    <span id="mine-counter">
+                        <?php
+                        $totalMines = substr_count($bombs, '1');
+                        echo str_pad($totalMines, 3, '0', STR_PAD_LEFT);
+                        ?>
+                    </span>
+                </div>
+            </div>
+
+            <div id="inventory-items">
+                <h2> <strong>Items</strong> </h2>
+                You currently have no items to use.
             </div>
             <div id="game-area">
                 <div id="board"></div>
@@ -416,28 +460,7 @@ $width = $gamemodeInfo['width'];
                                 alert('Error: ' + error);
                             });
 
-                        // alert("elapsed seconds: " + elapsedSeconds);
-
-                        // update game time after each click
-                        // fetch('request-db.php', {
-                        //     method: 'POST',
-                        //     headers: {
-                        //         'Content-Type': 'application/x-www-form-urlencoded',
-                        //     },
-                        //     body: `action=${encodeURIComponent('updateGameTime')}` +
-                        //         `&gameId=${encodeURIComponent(gameId)}` +
-                        //         `&gameTime=${encodeURIComponent(elapsedSeconds)}`
-                        // })
-                        // .then(response => response.text())
-                        // .then(data => {
-                        //     // alert('Game time updated: ' + data);
-                        // })
-                        // .catch((error) => {
-                        //     alert('Error updating game time: ' + error);
-                        // });
-
                         if (state_status === "WIN") {
-                            // alert("Updating points for game " + gameId + " mode " + mode);
                             fetch('request-db.php', {
                                 method: 'POST',
                                 headers: {
@@ -629,6 +652,8 @@ $width = $gamemodeInfo['width'];
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
 
 </body>

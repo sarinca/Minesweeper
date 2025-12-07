@@ -64,7 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="styles.css">
 
     <style>
-                .vertical-nav {
+        .body {
+            overflow: hidden;
+        }
+
+        .vertical-nav {
             position: fixed;
             left: 0;
             top: 70px;
@@ -95,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             background-color: #fbe9af;
             border-left-color: #ffc562;
         }
-        
+
         .profile-dropdown {
             background-color: rgba(252, 245, 217);
             width: 100px;
@@ -113,6 +117,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .vertical-nav {
             position: relative !important;
             top: 0px !important;
+        }
+
+        #page-title {
+            text-align: center;
+            font-family: 'Inder', sans-serif;
+            font-weight: bolder;
+            font-size: 36px;
+            background-color: #ffc562;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        #playBtn {
+            font-family: 'Inder', sans-serif;
+        }
+
+        #playBtn:hover {
+            background-color: #ff0000ff;
+
         }
     </style>
 
@@ -156,11 +179,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>
         <div class="m-5" style="width:68%;">
-            <h2 class="mb-5"> Create New Game </h2>
+            <h2 class="mb-5" id="page-title"> Create New Game </h2>
             <form method="post" action="<?php $_SERVER['PHP_SELF'] ?>" class="container text-center mt-4">
                 <div class="row mb-2">
                     <div class="col-md-6 mb-2">
-                        <input class="btn btn-lg w-75"
+                        <input class="btn btn-lg w-75" id="playBtn"
                             style="background-color: #FFD788; padding: 18px 40px; font-size: 1.5rem; font-weight: bold;"
                             type="submit" Value="Easy" name="easyBtn">
                         <p class="mt-2">
@@ -170,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             Points: 5 </p>
                     </div>
                     <div class="col-md-6 mb-2">
-                        <input class="btn btn-lg w-75"
+                        <input class="btn btn-lg w-75" id="playBtn"
                             style="background-color: #FFD788; padding: 18px 40px; font-size: 1.5rem; font-weight: bold;"
                             type="submit" Value="Medium" name="mediumBtn">
                         <p class="mt-2">
@@ -182,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="row">
                     <div class="col-12 text-center">
-                        <input class="btn btn-lg"
+                        <input class="btn btn-lg" id="playBtn"
                             style="background-color: #FFD788; padding: 18px 125px; font-size: 1.5rem; font-weight: bold;"
                             type="submit" Value="Hard" name="hardBtn">
                         <p class="mt-2">
@@ -195,6 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </form>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 
 </body>

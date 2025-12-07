@@ -126,6 +126,11 @@ restore_error_handler();
             padding: 20px;
             border-radius: 15px;
         }
+
+        #makeGameBtn {
+            font-family: 'Inder', sans-serif;
+            background-color: #ffc562;
+        }
     </style>
 </head>
 
@@ -186,7 +191,7 @@ restore_error_handler();
                 //display a button that says play game
                 //NOTE: we need to change this link so that we can link it to the game page
                 echo '<div style = "display:flex; justify-content: center;">
-                <a class="btn loginbtn rounded-pill mt-3" href="create_game.php">Start a game!</a>
+                <a class="btn loginbtn rounded-pill mt-3" id="makeGameBtn" href="create_game.php">Start a game!</a>
                 </div>';
             } else {
                 //log in to play!
