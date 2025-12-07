@@ -24,6 +24,7 @@ if ($_SESSION["username"] == NULL) {
     if (isset($_SESSION['user_id'])) {
         $user_id = $_SESSION['user_id'];
         $userStats = getUserStats($user_id);
+        $username = $_SESSION["username"];
     }
 }
 
@@ -41,6 +42,12 @@ $height = $gamemodeInfo['height'];
 $width = $gamemodeInfo['width'];
 // echo "game.php loaded";
 $userInventory = getUserInventory($user_id);
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["restartBtn"])) {
+    addNewGame($username, $gamemodeInfo);
+    exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -204,8 +211,9 @@ $userInventory = getUserInventory($user_id);
             grid-column: 2;
             grid-row: 2 / 4;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
         }
 
         #inventory-items {
@@ -249,6 +257,34 @@ $userInventory = getUserInventory($user_id);
             /* margin-left: 75px; */
             /* margin-top: 20px; */
         }
+
+        #restart-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;  /* spacing above the board */
+        }
+
+        #restart-btn {
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            cursor: pointer;
+            background: #FFE9B1;
+            border: 3px solid #eeba53ff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #restart-btn:hover {
+            background: #fddf86;
+        }
+
+        /* .cell:active #restart-icon { // dont work :(
+            content: url('images/shock.png');
+        } */
 
         .navbar {
             position: relative !important;
@@ -314,7 +350,7 @@ $userInventory = getUserInventory($user_id);
                         echo str_pad($totalMines, 3, '0', STR_PAD_LEFT);
                         ?>
                     </span>
-                </div>
+                </div>           
             </div>
 
             <div id="inventory-items">
@@ -348,6 +384,13 @@ $userInventory = getUserInventory($user_id);
                 });
             </script>
             <div id="game-area">
+                <div id="restart-container">
+                    <form method="POST" style="text-align:center;">
+                        <button id="restart-btn" type="submit" name="restartBtn">
+                            <img id="restart-icon" src="images/smile.png" alt="Restart" width="20" height="20"> 
+                        </button>
+                    </form>
+                </div>
                 <div id="board"></div>
 
                 <script>
@@ -418,6 +461,16 @@ $userInventory = getUserInventory($user_id);
 
 
                     cells.forEach(cell => {
+
+                        document.addEventListener("mousedown", function (e) {
+                            if (e.button === 0 && e.target.classList.contains("cell")) {
+                                document.getElementById("restart-icon").src = "images/shock.png";
+                            }
+                        });
+
+                        document.addEventListener("mouseup", function () {
+                            document.getElementById("restart-icon").src = "images/smile.png";
+                        });
 
                         // left click (javascript is so weird guys)
                         cell.addEventListener("click", () => {
@@ -509,9 +562,9 @@ $userInventory = getUserInventory($user_id);
                             .then(data => {
                                 // alert('Success: ' + data);
                                 if(state_status === "WIN") {
-                                    alert('You win!')
+                                    document.getElementById("restart-icon").src = "images/swag.png";
                                 } else if (state_status === "LOSE") {
-                                    alert('Boo! You lose!')
+                                    document.getElementById("restart-icon").src = "images/dead.png";
                                 }
                             })
                             .catch((error) => {
