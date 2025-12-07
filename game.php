@@ -320,7 +320,7 @@ $userInventory = getUserInventory($user_id);
             <div id="inventory-items">
                 <h2> <strong>Items</strong> </h2>
                 <?php if (empty($userInventory)): ?>
-                    <p class="text-center text-muted">You currently have no items to use.</p>
+                    <p class="text-center text-muted" id="items-available">You currently have no items to use.</p>
                 <?php else: ?>
                     <div class="inventory-grid">
                         <?php foreach ($userInventory as $item): ?>
@@ -344,7 +344,6 @@ $userInventory = getUserInventory($user_id);
                         // alert(`You clicked on item: ${itemName}`);
                         useItem(itemName);
                         updateInventoryDisplay(itemName);
-                        // Here you can add more functionality, like using the item in the game
                     });
                 });
             </script>
@@ -599,9 +598,23 @@ $userInventory = getUserInventory($user_id);
                                 quantityElem.textContent = `Quantity: ${quantity}`;
                                 if (quantity === 0) {
                                     item.remove(); // Remove item from display if quantity is 0
+                                    checkEmptyInventory();
                                 }
                             }
                         });
+                    }
+
+                    function checkEmptyInventory() {
+                        const items = document.querySelectorAll('.inventory-item');
+                        if (items.length === 0) {
+                            const inventoryDiv = document.getElementById('inventory-items');
+                            inventoryDiv.innerHTML = `
+                                <h2><strong>Items</strong></h2>
+                                <p class="text-center text-muted" id="items-available">
+                                    You currently have no items to use.
+                                </p>
+                            `;
+                        }
                     }
 
                     function checkWin() {
