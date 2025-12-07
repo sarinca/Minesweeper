@@ -31,6 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'useItem') {
     // echo "using item...";
     exit();
 }
+// if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'addNewGame') {
+//     // echo "adding new game...";
+//     addNewGame($_POST['currUsername'], $_POST['gamemodeInfo']);
+//     exit();
+// }
 
 
 // -------------------- REGISTER FUNCTIONS -------------------- //
@@ -515,7 +520,7 @@ function getGamemodeInfo($mode){
 }
 
 function addNewGame($currUsername, $gameInfo){
-    echo "Adding new game...";
+    // echo "Adding new game...";
     global $db;
 
     $mode = $gameInfo['mode'];
@@ -523,7 +528,7 @@ function addNewGame($currUsername, $gameInfo){
     $width = $gameInfo['width'];
     $numBombs = $gameInfo['numBombs'];
 
-    echo "received info for mode, height, width, numBombs";
+    // echo "received info for mode, height, width, numBombs";
 
     $totalCells = $height * $width;
 
@@ -537,12 +542,12 @@ function addNewGame($currUsername, $gameInfo){
     $state_boxesClicked = implode("", $boxesClicked);
     $state_bombPlacement = implode("", $bombPlacement);
 
-    echo "current username: " . $currUsername;
+    // echo "current username: " . $currUsername;
 
     $username = $currUsername; // currently doesnt work but i think thats bc defaultUser doesnt have an actual userId?
 
     $gameTime = 0;
-    echo "querying...";
+    // echo "querying...";
 
     try{
 
