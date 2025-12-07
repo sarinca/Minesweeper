@@ -467,12 +467,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["restartBtn"])) {
                     cells.forEach(cell => {
 
                         document.addEventListener("mousedown", function (e) {
+                            if (state_status === "WIN" || state_status === "LOSE") {
+                                return; // Ignore clicks if game is over
+                            }
                             if (e.button === 0 && e.target.classList.contains("cell")) {
                                 document.getElementById("restart-icon").src = "images/shock.png";
                             }
                         });
 
                         document.addEventListener("mouseup", function () {
+                            if (state_status === "WIN" || state_status === "LOSE") {
+                                return; // Ignore clicks if game is over
+                            }
                             document.getElementById("restart-icon").src = "images/smile.png";
                         });
 
