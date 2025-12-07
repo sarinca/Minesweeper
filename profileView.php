@@ -21,53 +21,30 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
-
-if (isset($_GET['search_users'])) {
-    header('Content-Type: application/json');
-    $query = $_GET['q'] ?? '';
-    $results = searchUsers($user_id, $query);
-    echo json_encode($results);
-    exit;
+if (!isset($_GET['user_id'])) {
+    header("Location: login.php");
+    exit();
 }
+
+$user_id = $_SESSION['user_id'];
+$viewedUser = $_GET['user_id'];
 
 $debug_messages = [];
 $debug_messages[] = "Page loaded at: " . date('H:i:s');
 $debug_messages[] = "User ID: $user_id";
 $debug_messages[] = "Request Method: " . $_SERVER['REQUEST_METHOD'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $debug_messages[] = "POST received!";
-    $debug_messages[] = "POST data: " . json_encode($_POST);
-    if (!empty($_POST['deleteFriendBtn'])) {
-        deleteFriend($user_id, $_POST['friend_id']);
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    } elseif (!empty($_POST['deleteGameBtn'])) {
-        deleteGame($_POST['game_id']);
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    }  elseif (!empty($_POST['resumeGameBtn'])) {
-        // updating, navigate to header("Location: game.php?gameId=[gameId]"); 
-        // header("Location: " . $_SERVER['PHP_SELF']);
-        header("Location: game.php?gameId=" . $_POST['game_id']);
-        exit();
-    } elseif (isset($_POST['updateProfileBtn'])) {
-        updateProfile($user_id, $_POST);
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    } elseif (isset($_POST['addFriendBtn'])) {
-        addFriend($user_id, $_POST['friend_id']);
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    }
-}
-
 $userStats = getUserStats($user_id);
 $gamesPlayed = getGamesPlayed($user_id);
 $gameHistory = getGameHistory($user_id);
 $userFriends = getUserFriends($user_id);
 $userInventory = getUserInventory($user_id);
+
+$viewedUserStats = getUserStats($viewedUser);
+$viewedGamesPlayed = getGamesPlayed($viewedUser);
+$viewedGameHistory = getGameHistory($viewedUser);
+$viewedUserFriends = getUserFriends($viewedUser);
+$viewedUserInventory = getUserInventory($viewedUser);
 ?>
 
 <!DOCTYPE html>
@@ -176,7 +153,7 @@ $userInventory = getUserInventory($user_id);
             margin-left: 400px;
             margin-right: 100px;
             font-size: 24px;
-            width: 150px;
+            width: 600px;
             border-radius: 15px;
         }
 
@@ -658,68 +635,29 @@ $userInventory = getUserInventory($user_id);
 
     <div class="container mt-4" id="name&stats">
         <div class=user-and-pfp>
-            <img src="<?php echo !empty($userStats['profilePicture_path'])
-                ? $userStats['profilePicture_path']
+            <img src="<?php echo !empty($viewedUserStats['profilePicture_path'])
+                ? $viewedUserStats['profilePicture_path']
                 : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>" alt="Profile Picture"
                 id="bigPfp" class="rounded-circle me-2" width="60" height="60">
 
-            <h1 class = "nameSpace">Hello, <?php echo htmlspecialchars($userStats['username']); ?></h1>
-            <!-- Button to Edit PFP & Username -->
-            <button class="btn" id="editPfpBtn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                Edit
-            </button>
-        </div>
-        <!-- Edit Profile Modal -->
-        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
+            <h1 class = "nameSpace"><?php echo htmlspecialchars($viewedUserStats['username']); ?>'s Profile</h1>
+            <a href="profile.php" class="btn" id="editPfpBtn">
+                Back to My Profile
+            </a>
 
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editProfileLabel">Edit Profile</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <form method="POST" action="">
-                        <div class="modal-body">
-
-                            <!-- Username -->
-                            <div class="mb-3">
-                                <label for="usernameInput" class="form-label">New Username</label>
-                                <input type="text" class="form-control" id="usernameInput" name="username"
-                                    value="<?php echo htmlspecialchars($userStats['username']); ?>" required>
-                            </div>
-
-                            <!-- Profile Picture URL -->
-                            <div class="mb-3">
-                                <label for="pfpUrlInput" class="form-label">Profile Picture URL</label>
-                                <input type="url" class="form-control" id="pfpUrlInput" name="pfp_url"
-                                    value="<?php echo htmlspecialchars($userStats['profilePicture_path'] ?? ''); ?>"
-                                    placeholder="https://example.com/image.png">
-                            </div>
-
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" name="updateProfileBtn" class="btn btn-primary">Save Changes</button>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
+            
         </div>
 
         <hr>
         <div class="stats-container">
-            <p class="stat-label">Total Coins: <span class="stat-box"> <?php echo $userStats['points']; ?></span></p>
-            <p class="stat-label">Total Score: <span class="stat-box"><?php echo $userStats['totalScore']; ?></span></p>
+            <p class="stat-label">Total Coins: <span class="stat-box"> <?php echo $viewedUserStats['points']; ?></span></p>
+            <p class="stat-label">Total Score: <span class="stat-box"><?php echo $viewedUserStats['totalScore']; ?></span></p>
             <p class="stat-label">Games Played: <span
-                    class="stat-box"><?php echo $gamesPlayed['games_played']; ?></span></p>
+                    class="stat-box"><?php echo $viewedGamesPlayed['games_played']; ?></span></p>
             <p class="stat-label">Fastest Time: <span class="stat-box">
                     <?php
-                    if (!empty($gamesPlayed['fastest_time'])) {
-                        $seconds = $gamesPlayed['fastest_time'];
+                    if (!empty($viewedGamesPlayed['fastest_time'])) {
+                        $seconds = $viewedGamesPlayed['fastest_time'];
                         $minutes = floor($seconds / 60);
                         $secs = $seconds % 60;
                         echo sprintf('%02d:%02d', $minutes, $secs);
@@ -739,16 +677,16 @@ $userInventory = getUserInventory($user_id);
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#collapseGameHistory" aria-expanded="false" aria-controls="collapseGameHistory">
-                        Game History
+                        <?php echo htmlspecialchars($viewedUserStats['username']); ?>'s Game History
                     </button>
                 </h2>
                 <div id="collapseGameHistory" class="accordion-collapse collapse" data-bs-parent="#dashboardAccordion">
                     <div class="accordion-body" style="padding: 2rem;">
-                        <?php if (empty($gameHistory)): ?>
-                            <p class="text-center text-muted">No games played yet. Start playing to build your history!</p>
+                        <?php if (empty($viewedGameHistory)): ?>
+                            <p class="text-center text-muted">No games played yet.</p>
                         <?php else: ?>
                             <div class="game-history-grid">
-                                <?php foreach ($gameHistory as $game): ?>
+                                <?php foreach ($viewedGameHistory as $game): ?>
                                     <?php
                                     // Determine which image to use based on game status
                                     $status = strtolower($game['state_status'] ?? '');
@@ -779,16 +717,6 @@ $userInventory = getUserInventory($user_id);
                                             ?>
                                         </p>
                                         <p class="game-score">Score: <?php echo $game['score'] ?? 'N/A'; ?></p>
-                                        <form method="post" style="margin: 0;">
-                                            <input type="hidden" name="game_id" value="<?php echo $game['gameId']; ?>">
-                                            <input type="submit" name="deleteGameBtn" class="btn btn-danger btn-sm"
-                                                value="Delete">
-                                            <?php if ($status === "in progress"){
-                                                // create a resume game button
-                                                echo "<input type='submit' name='resumeGameBtn' class='btn btn-success btn-sm'
-                                                value='Resume'>";
-                                            }?>
-                                        </form>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -802,47 +730,24 @@ $userInventory = getUserInventory($user_id);
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#collapseFriendsList" aria-expanded="false" aria-controls="collapseFriendsList">
-                        <span class="accordion-title">Your Friends</span>
-                        <label class="search search-inline" onclick="event.stopPropagation()">
-                            <div class="one">
-                                <div class="two">
-                                    <div class="three">
-                                        <input type="search" class="four" id="friendSearch"
-                                            placeholder="Search users..." onclick="event.stopPropagation()" />
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
+                        <span class="accordion-title"><?php echo htmlspecialchars($viewedUserStats['username']); ?>'s Friends</span>
                     </button>
                 </h2>
                 <div id="collapseFriendsList" class="accordion-collapse collapse" data-bs-parent="#dashboardAccordion">
                     <div class="accordion-body" style="padding: 2rem;">
-                        <!-- Search Results -->
-                        <div id="searchResults"></div>
-
-                        <hr>
-
                         <!-- Current Friends List -->
-                        <?php if (empty($userFriends)): ?>
-                            <p class="text-center text-muted">No friends yet. Search for users to add friends!</p>
+                        <?php if (empty($viewedUserFriends)): ?>
+                            <p class="text-center text-muted">No friends yet.</p>
                         <?php else: ?>
                             <div class="friends-grid">
-                                <?php foreach ($userFriends as $friend): ?>
+                                <?php foreach ($viewedUserFriends as $friend): ?>
                                     <div class="friend-item">
-                                        <a href="profileView.php?user_id=<?php echo $friend['friend_id']; ?>"
-                                            class="text-decoration-none text-dark">
-                                            <img src="<?php echo !empty($friend['profilePicture_path'])
-                                                ? htmlspecialchars($friend['profilePicture_path'])
-                                                : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>"
-                                                alt="<?php echo htmlspecialchars($friend['friend_username']); ?>"
-                                                class="friend-image rounded-circle">
-                                            <h6 class="friend-name"><?php echo htmlspecialchars($friend['friend_username']); ?></h6>
-                                        </a>
-                                        <form method="post" style="margin: 0;">
-                                            <input type="hidden" name="friend_id" value="<?php echo $friend['friend_id']; ?>">
-                                            <input type="submit" name="deleteFriendBtn" class="btn btn-danger btn-sm"
-                                                value="Remove">
-                                        </form>
+                                        <img src="<?php echo !empty($friend['profilePicture_path'])
+                                            ? htmlspecialchars($friend['profilePicture_path'])
+                                            : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>"
+                                            alt="<?php echo htmlspecialchars($friend['friend_username']); ?>"
+                                            class="friend-image rounded-circle">
+                                        <h6 class="friend-name"><?php echo htmlspecialchars($friend['friend_username']); ?></h6>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -855,16 +760,16 @@ $userInventory = getUserInventory($user_id);
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#collapseInventory" aria-expanded="false" aria-controls="collapseInventory">
-                        Inventory
+                        <?php echo htmlspecialchars($viewedUserStats['username']); ?>'s Inventory
                     </button>
                 </h2>
                 <div id="collapseInventory" class="accordion-collapse collapse" data-bs-parent="#dashboardAccordion">
                     <div class="accordion-body" style="padding: 2rem;">
-                        <?php if (empty($userInventory)): ?>
-                            <p class="text-center text-muted">No items in inventory. Visit the shop to purchase items!</p>
+                        <?php if (empty($viewedUserInventory)): ?>
+                            <p class="text-center text-muted">No items in inventory.</p>
                         <?php else: ?>
                             <div class="inventory-grid">
-                                <?php foreach ($userInventory as $item): ?>
+                                <?php foreach ($viewedUserInventory as $item): ?>
                                     <div class="inventory-item">
                                         <img src="<?php echo htmlspecialchars($item['image_path']); ?>"
                                             alt="<?php echo htmlspecialchars($item['name']); ?>" class="inventory-image">
@@ -889,46 +794,6 @@ $userInventory = getUserInventory($user_id);
             console.log(<?php echo json_encode($msg); ?>);
         <?php endforeach; ?>
         console.log("=== DEBUG END ===");
-    </script>
-    <script>
-
-        // Search for users
-        let searchTimeout;
-        document.getElementById('friendSearch').addEventListener('input', function (e) {
-            clearTimeout(searchTimeout);
-            const query = e.target.value.trim();
-
-            if (query.length < 2) {
-                document.getElementById('searchResults').innerHTML = '';
-                return;
-            }
-
-            searchTimeout = setTimeout(() => {
-                fetch('profile.php?search_users=1&q=' + encodeURIComponent(query))
-                    .then(response => response.json())
-                    .then(users => {
-                        const resultsDiv = document.getElementById('searchResults');
-
-                        if (users.length === 0) {
-                            resultsDiv.innerHTML = '<p class="text-muted" style="padding: 1rem;">No users found</p>';
-                            return;
-                        }
-
-                        resultsDiv.innerHTML = users.map(user => `
-                            <div class="search-result-item">
-                                <span><strong>${user.username}</strong></span>
-                                <form method="post" style="margin: 0;">
-                                    <input type="hidden" name="friend_id" value="${user.userId}">
-                                    <button type="submit" name="addFriendBtn" class="btn btn-primary btn-sm">
-                                        Add Friend
-                                    </button>
-                                </form>
-                            </div>
-                        `).join('');
-                    })
-                    .catch(error => console.error('Search error:', error));
-            }, 300);
-        });
     </script>
 </body>
 
