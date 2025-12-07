@@ -206,7 +206,8 @@ function getEntriesByMode($mode)
     $query = "SELECT lead.gameId as gameId, game.gameTime as gameTime, profile.username as username, game.mode as mode
     FROM leaderboardEntry AS lead NATURAL JOIN game NATURAL JOIN profile
     WHERE mode = :mode
-    ORDER BY gameTime ASC";
+    ORDER BY gameTime ASC
+    LIMIT 10;";
     $statement = $db->prepare($query);
     $statement->bindValue(':mode', $mode);  //this minimizes security risk
 
@@ -241,7 +242,8 @@ function getEntriesByFriendAndMode($mode, $currUserId) {
             SELECT lead.gameId as gameId, game.gameTime as gameTime, profile.username as username, game.mode as mode
             FROM leaderboardEntry AS lead NATURAL JOIN game NATURAL JOIN profile NATURAL JOIN MyFriends
             WHERE mode = :mode
-            ORDER BY gameTime ASC";
+            ORDER BY gameTime ASC
+            LIMIT 10";
     $statement = $db->prepare($query);
     $statement->bindValue(':mode', $mode);  //this minimizes security risk
     $statement->bindValue(':currUserId', $currUserId);
