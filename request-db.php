@@ -3,25 +3,27 @@ require('connect-db.php');
 
 // var_dump($_SERVER['REQUEST_METHOD'], $_POST['action']);
 // detect action for updating game state w/o reloading page
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameState') {
-    // echo "updating game state...";
-    updateGameState($_POST['gameId'], $_POST['game_state'], $_POST['state_status']);
-    exit();
-} 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updatePoints') {
-    // echo "updating points...";
-    updatePoints($_POST['gameId'], $_POST['mode']);
-    exit();
-}
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameTime') {
-    // echo "updating game time...";
-    updateGameTime($_POST['gameId'], $_POST['gameTime']);
-    exit();
-}
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'addLeaderboardEntry') {
-    // echo "adding leaderboard entry...";
-    addLeaderboardEntry($_POST['gameId']);
-    exit();
+if (isset($_POST['action'])){
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameState') {
+        // echo "updating game state...";
+        updateGameState($_POST['gameId'], $_POST['game_state'], $_POST['state_status']);
+        exit();
+    } 
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updatePoints') {
+        // echo "updating points...";
+        updatePoints($_POST['gameId'], $_POST['mode']);
+        exit();
+    }
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'updateGameTime') {
+        // echo "updating game time...";
+        updateGameTime($_POST['gameId'], $_POST['gameTime']);
+        exit();
+    }
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'addLeaderboardEntry') {
+        // echo "adding leaderboard entry...";
+        addLeaderboardEntry($_POST['gameId']);
+        exit();
+    }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'useItem') {
     // echo "using item...";
@@ -29,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'useItem') {
     // echo "using item...";
     exit();
 }
+
 
 // -------------------- REGISTER FUNCTIONS -------------------- //
 function check_registration($email, $username) {
