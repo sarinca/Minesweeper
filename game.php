@@ -1,10 +1,26 @@
 <?php
-require('connect-db.php');    
+require('connect-db.php');
 require('request-db.php');
 
 session_start();
 
 $gameId = $_GET['gameId'];
+$userStats = null;
+
+
+if ($_SESSION["username"] == NULL) {
+    // echo "Session not established yet";
+} else {
+    // echo $_SESSION["username"];
+    // echo " ";
+    // echo $_SESSION["email"];
+    $user_loggedIn = true;
+
+    if (isset($_SESSION['user_id'])) {
+        $user_id = $_SESSION['user_id'];
+        $userStats = getUserStats($user_id);
+    }
+}
 
 $gameInfo = getGameInfo($gameId);
 $mode = $gameInfo['mode'];
@@ -23,16 +39,17 @@ $width = $gamemodeInfo['width'];
 
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">    
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="author" content="Megan Natalia Nicole Sarina">
-  <meta name="description" content="Minesweeper game page">
-  <meta name="keywords" content="minesweeper game database">
-  
-  <title>Minesweeper Game</title>
-  <link rel="shortcut icon" type="image/x-icon"
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Megan Natalia Nicole Sarina">
+    <meta name="description" content="Minesweeper game page">
+    <meta name="keywords" content="minesweeper game database">
+
+    <title>Minesweeper Game</title>
+    <link rel="shortcut icon" type="image/x-icon"
         href="https://static.vecteezy.com/system/resources/previews/042/608/027/non_2x/simple-flag-line-icon-free-vector.jpg" />
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -41,6 +58,48 @@ $width = $gamemodeInfo['width'];
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
+                .vertical-nav {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            width: 200px;
+            height: calc(100vh - 70px);
+            background-color: rgba(252, 245, 217);
+            padding: 2rem 0;
+            z-index: 999;
+        }
+
+        .vertical-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .vertical-nav .nav-link {
+            color: #000000ff;
+            padding: 1rem 1.5rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            display: block;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .vertical-nav .nav-link:hover {
+            background-color: #fbe9af;
+            border-left-color: #ffc562;
+        }
+        
+        .profile-dropdown {
+            background-color: rgba(252, 245, 217);
+            width: 100px;
+            margin-right: 80px;
+        }
+
+        .dropdown-menu {
+            margin-right: 50px;
+        }
+
         #board {
             display: grid;
             grid-template-columns: repeat(<?php echo $width; ?>, 30px);
@@ -49,6 +108,7 @@ $width = $gamemodeInfo['width'];
             background-color: #eeba53ff;
             border: 5px solid #eeba53ff;
         }
+
         .cell {
             width: 30px;
             height: 30px;
@@ -59,6 +119,7 @@ $width = $gamemodeInfo['width'];
             font-size: 18px;
             text-align: center;
         }
+
         .cell.clicked {
             background-color: #FFD788;
             font-weight: bold;
@@ -66,6 +127,7 @@ $width = $gamemodeInfo['width'];
             text-align: center;
             line-height: 30px;
         }
+
         #game-area {
             display: flex;
             justify-content: center;
@@ -73,25 +135,53 @@ $width = $gamemodeInfo['width'];
             height: 100vh;
             margin-left: 200px;
         }
-        .mine-1 { color: blue; }
-        .mine-2 { color: green; }
-        .mine-3 { color: red; }
-        .mine-4 { color: darkblue; }
-        .mine-5 { color: brown; }
-        .mine-6 { color: cyan; }
-        .mine-7 { color: purple; }
-        .mine-8 { color: gray; }
+
+        .mine-1 {
+            color: blue;
+        }
+
+        .mine-2 {
+            color: green;
+        }
+
+        .mine-3 {
+            color: red;
+        }
+
+        .mine-4 {
+            color: darkblue;
+        }
+
+        .mine-5 {
+            color: brown;
+        }
+
+        .mine-6 {
+            color: cyan;
+        }
+
+        .mine-7 {
+            color: purple;
+        }
+
+        .mine-8 {
+            color: gray;
+        }
+
         #top-bar {
             width: 100%;
             display: flex;
-            justify-content: space-between;  /* Timer left, mines right */
+            justify-content: space-between;
+            /* Timer left, mines right */
             align-items: center;
             padding: 10px 20px;
             box-sizing: border-box;
         }
-        #timer, #mine-counter {
+
+        #timer,
+        #mine-counter {
             display: inline-block;
-            align-self: flex-start; 
+            align-self: flex-start;
             height: auto;
             vertical-align: middle;
             font-family: "Press Start 2P", monospace;
@@ -105,9 +195,11 @@ $width = $gamemodeInfo['width'];
             margin-left: 75px;
             margin-top: 20px;
         }
+
         .navbar {
             position: relative !important;
         }
+
         .vertical-nav {
             position: relative !important;
             top: 0px !important;
@@ -116,28 +208,33 @@ $width = $gamemodeInfo['width'];
 </head>
 
 <body>
-     <!-- Top Navigation Bar [ Minesweeper Title, User Profile Button ]-->
+    <!-- Top Navigation Bar [ Minesweeper Title, User Profile Button ]-->
     <nav class="navbar navbar-expand-lg px-3">
         <div class="container-fluid">
             <a class="navbar-parent">Minesweeper</a>
-            <div class="d-flex align-items-center">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
-                    alt="Profile Picture" id="pfp" class="rounded-circle me-2" width="40" height="40">
+            <?php if ($user_loggedIn && $userStats): ?>
+                <div class="d-flex align-items-center">
+                    <img src="<?php echo !empty($userStats['profilePicture_path'])
+                        ? htmlspecialchars($userStats['profilePicture_path'])
+                        : 'https://i.pinimg.com/custom_covers/222x/85498161615209203_1636332751.jpg'; ?>" id="pfp"
+                        class="rounded-circle me-2" width="40" height="40">
 
-                <div class="profile-dropdown">
-                    <!-- Dropdown toggle button (always shows username) -->
-                    <button class="btn dropdown-toggle" type="button" id="userDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <?php echo $_SESSION["username"]; ?>
-                    </button>
+                    <div class="profile-dropdown">
+                        <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <?php echo htmlspecialchars($userStats['username']); ?>
+                        </button>
 
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="profile.html">Profile</a></li>
-                        <li> <hr class="dropdown-divider"> </li>
-                        <li><a class="dropdown-item" href="login_page.html">Logout</a></li>
-                    </ul>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="index.php?action=logout">Logout</a></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </nav>
 
@@ -154,9 +251,9 @@ $width = $gamemodeInfo['width'];
             <div id="top-bar">
                 <span id="timer">000</span>
                 <span id="mine-counter">
-                    <?php 
-                        $totalMines = substr_count($bombs, '1');
-                        echo str_pad($totalMines, 3, '0', STR_PAD_LEFT); 
+                    <?php
+                    $totalMines = substr_count($bombs, '1');
+                    echo str_pad($totalMines, 3, '0', STR_PAD_LEFT);
                     ?>
                 </span>
             </div>
@@ -208,8 +305,8 @@ $width = $gamemodeInfo['width'];
                                     cell.textContent = mineCount > 0 ? mineCount : ""; // if no adjacent mines, leave blank, otherwise show count
 
                                     cell.classList.remove(
-                                        "mine-1","mine-2","mine-3","mine-4",
-                                        "mine-5","mine-6","mine-7","mine-8"
+                                        "mine-1", "mine-2", "mine-3", "mine-4",
+                                        "mine-5", "mine-6", "mine-7", "mine-8"
                                     );
 
                                     if (mineCount > 0) {
@@ -228,7 +325,7 @@ $width = $gamemodeInfo['width'];
 
                     var gameStarted = false;
 
-                    
+
                     cells.forEach(cell => {
 
                         // left click (javascript is so weird guys)
@@ -258,27 +355,27 @@ $width = $gamemodeInfo['width'];
                                 cell.classList.add("clicked");
                                 game_state[index] = '1';
                                 cell.textContent = "💣";
-                                revealMines();   
-                                state_status = "LOSE"; 
+                                revealMines();
+                                state_status = "LOSE";
                                 clearInterval(displayTimer);
 
                             } else {
-                                checkMine(row, col); 
-                                state_status = checkWin(); 
+                                checkMine(row, col);
+                                state_status = checkWin();
                                 if (state_status === "WIN") {
                                     clearInterval(displayTimer);
                                 }
                             }
                             // alert("status = 4 " + state_status);
 
-                            updateDB(game_state, state_status, "<?php echo $mode; ?>"); 
+                            updateDB(game_state, state_status, "<?php echo $mode; ?>");
                             return;
                         });
 
                         // right click (works perfect make NO edits :D)
                         cell.addEventListener("contextmenu", (e) => {
                             e.preventDefault(); //removed the default context menu
-                            
+
                             if (cell.classList.contains("clicked")) {
                                 return; // Ignore right-clicks on already clicked cells
                             }
@@ -311,13 +408,13 @@ $width = $gamemodeInfo['width'];
                                 `&game_state=${encodeURIComponent(game_state_str)}` +
                                 `&state_status=${encodeURIComponent(state_status)}`
                         })
-                        .then(response => response.text())
-                        .then(data => {
-                            // alert('Success: ' + data);
-                        })
-                        .catch((error) => {
-                            alert('Error: ' + error);
-                        });
+                            .then(response => response.text())
+                            .then(data => {
+                                // alert('Success: ' + data);
+                            })
+                            .catch((error) => {
+                                alert('Error: ' + error);
+                            });
 
                         // alert("elapsed seconds: " + elapsedSeconds);
 
@@ -350,13 +447,13 @@ $width = $gamemodeInfo['width'];
                                     `&gameId=${encodeURIComponent(gameId)}` +
                                     `&mode=${encodeURIComponent(mode)}`
                             })
-                            .then(response => response.text())
-                            .then(data => {
-                                // alert('Points updated: ' + data);
-                            })
-                            .catch((error) => {
-                                alert('Error updating points: ' + error);
-                            });
+                                .then(response => response.text())
+                                .then(data => {
+                                    // alert('Points updated: ' + data);
+                                })
+                                .catch((error) => {
+                                    alert('Error updating points: ' + error);
+                                });
 
                             fetch('request-db.php', {
                                 method: 'POST',
@@ -364,16 +461,16 @@ $width = $gamemodeInfo['width'];
                                     'Content-Type': 'application/x-www-form-urlencoded',
                                 },
                                 body: `action=${encodeURIComponent('addLeaderboardEntry')}` +
-                                    `&gameId=${encodeURIComponent(gameId)}` 
+                                    `&gameId=${encodeURIComponent(gameId)}`
                             })
-                            .then(response => response.text())
-                            .then(data => {
-                                // alert('Leaderboard entry added: ' + data);
-                            })
-                            .catch((error) => {
-                                alert('Error adding leaderboard entry: ' + error);
-                            });
-                        } 
+                                .then(response => response.text())
+                                .then(data => {
+                                    // alert('Leaderboard entry added: ' + data);
+                                })
+                                .catch((error) => {
+                                    alert('Error adding leaderboard entry: ' + error);
+                                });
+                        }
                     }
 
                     function checkWin() {
@@ -403,13 +500,13 @@ $width = $gamemodeInfo['width'];
                                         `&gameId=${encodeURIComponent(gameId)}` +
                                         `&gameTime=${encodeURIComponent(elapsedSeconds)}`
                                 })
-                                .then(response => response.text())
-                                .then(data => {
-                                    // alert('Game time updated: ' + data);
-                                })
-                                .catch((error) => {
-                                    alert('Error updating game time: ' + error);
-                                });
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        // alert('Game time updated: ' + data);
+                                    })
+                                    .catch((error) => {
+                                        alert('Error updating game time: ' + error);
+                                    });
 
                                 document.getElementById("timer").textContent = String(elapsedSeconds).padStart(3, '0');
                             }
@@ -444,20 +541,20 @@ $width = $gamemodeInfo['width'];
                         return 0;
                     }
 
-                    function countSurroundingMines(row, col) { 
+                    function countSurroundingMines(row, col) {
                         let mineCount = 0;
-                        mineCount += countMine(row-1, col-1); // top left
-                        mineCount += countMine(row-1, col); // top middle
-                        mineCount += countMine(row-1, col+1); // top right
+                        mineCount += countMine(row - 1, col - 1); // top left
+                        mineCount += countMine(row - 1, col); // top middle
+                        mineCount += countMine(row - 1, col + 1); // top right
 
                         // left and right
-                        mineCount += countMine(row, col-1);
-                        mineCount += countMine(row, col+1);
+                        mineCount += countMine(row, col - 1);
+                        mineCount += countMine(row, col + 1);
 
                         // bottom 3
-                        mineCount += countMine(row+1, col-1); // bottom left
-                        mineCount += countMine(row+1, col); // bottom middle
-                        mineCount += countMine(row+1, col+1); // bottom right
+                        mineCount += countMine(row + 1, col - 1); // bottom left
+                        mineCount += countMine(row + 1, col); // bottom middle
+                        mineCount += countMine(row + 1, col + 1); // bottom right
                         return mineCount;
                     }
 
@@ -499,8 +596,8 @@ $width = $gamemodeInfo['width'];
                         cell.textContent = mineCount > 0 ? mineCount : ""; // if no adjacent mines, leave blank, otherwise show count
 
                         cell.classList.remove(
-                            "mine-1","mine-2","mine-3","mine-4",
-                            "mine-5","mine-6","mine-7","mine-8"
+                            "mine-1", "mine-2", "mine-3", "mine-4",
+                            "mine-5", "mine-6", "mine-7", "mine-8"
                         );
 
                         // add class if mineCount > 0
@@ -511,22 +608,22 @@ $width = $gamemodeInfo['width'];
                         // if no adjacent mines, recursivley check neighbors
                         // alert("recursivley checking neighbors");
                         if (mineCount === 0) {
-                            checkMine(row-1, col-1); // top left
-                            checkMine(row-1, col); // top middle
-                            checkMine(row-1, col+1); // top right
+                            checkMine(row - 1, col - 1); // top left
+                            checkMine(row - 1, col); // top middle
+                            checkMine(row - 1, col + 1); // top right
 
                             // left and right
-                            checkMine(row, col-1);
-                            checkMine(row, col+1);
+                            checkMine(row, col - 1);
+                            checkMine(row, col + 1);
 
                             // bottom 3
-                            checkMine(row+1, col-1); // bottom left
-                            checkMine(row+1, col); // bottom middle
-                            checkMine(row+1, col+1); // bottom right
+                            checkMine(row + 1, col - 1); // bottom left
+                            checkMine(row + 1, col); // bottom middle
+                            checkMine(row + 1, col + 1); // bottom right
                         }
 
                     }
-                    
+
 
                 </script>
             </div>
@@ -535,4 +632,5 @@ $width = $gamemodeInfo['width'];
 
 
 </body>
+
 </html>
