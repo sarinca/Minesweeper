@@ -219,10 +219,14 @@ $userInventory = getUserInventory($user_id);
             font-size: 14px;
         }
 
+        .inventory-item: {
+            border-color: #ffe9a3;
+        }
+
         .inventory-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-color: #ffc562;
+            border: 3px solid #ffc562;
         }
 
         .inventory-image {
