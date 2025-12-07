@@ -4,6 +4,14 @@ require('request-db.php');
 
 session_start();
 
+//log out functionality
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
+
 $gameId = $_GET['gameId'];
 $userStats = null;
 
@@ -11,9 +19,6 @@ $userStats = null;
 if ($_SESSION["username"] == NULL) {
     // echo "Session not established yet";
 } else {
-    // echo $_SESSION["username"];
-    // echo " ";
-    // echo $_SESSION["email"];
     $user_loggedIn = true;
 
     if (isset($_SESSION['user_id'])) {
@@ -279,7 +284,7 @@ $userInventory = getUserInventory($user_id);
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="index.php?action=logout">Logout</a></li>
+                            <li><a class="dropdown-item" href="game.php?action=logout">Logout</a></li>
                         </ul>
                     </div>
                 </div>
@@ -290,6 +295,7 @@ $userInventory = getUserInventory($user_id);
     <div class="nav flex-row">
         <ul class="vertical-nav">
             <a class="nav-link" href="index.php">Home</a>
+            <a class="nav-link active" href="create_game.php">Play</a>
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
             <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>
@@ -298,7 +304,7 @@ $userInventory = getUserInventory($user_id);
             <div id="top-bar">
                 <div>
                     <div style="font-size: 12px; margin-bottom: 5px; text-align: center;">Timer</div>
-                    <span id="timer">000</span>
+                    <span id="timer"><?php echo sprintf('%03d', $gameTime); ?></span>
                 </div>
                 <div>
                     <div style="font-size: 12px; margin-bottom: 5px; text-align: center;">Mines</div>
@@ -461,6 +467,12 @@ $userInventory = getUserInventory($user_id);
                         // right click (works perfect make NO edits :D)
                         cell.addEventListener("contextmenu", (e) => {
                             e.preventDefault(); //removed the default context menu
+
+                            if (!gameStarted) {
+                                gameStarted = true;
+                                startDisplayTimer();
+                                // alert("Timer started!");
+                            }
 
                             if (cell.classList.contains("clicked")) {
                                 return; // Ignore right-clicks on already clicked cells
