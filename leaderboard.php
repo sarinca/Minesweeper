@@ -145,9 +145,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
 
-        body {
+        /* body {
             overflow: hidden;
-        }
+        } */
 
         tr.table-warning {
             --bs-table-bg: #FFE9B1 !important;
