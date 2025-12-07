@@ -220,6 +220,9 @@ restore_error_handler();
                                 <li class="nav-item">
                                     <a class="nav-link active" href="login.php">Login</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="register.php">Register</a>
+                                </li>
                             </ul>
                         </div>
                     </div>
