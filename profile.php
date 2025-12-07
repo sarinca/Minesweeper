@@ -645,6 +645,7 @@ $userInventory = getUserInventory($user_id);
     <nav class="nav flex-column">
         <ul class="vertical-nav">
             <a class="nav-link" href="index.php">Home</a>
+            <a class="nav-link" href="create_game.php">Play</a>
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
             <a class="nav-link" href="shop.php">Shop</a>
         </ul>

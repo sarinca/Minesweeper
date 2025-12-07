@@ -4,6 +4,13 @@ require('request-db.php');
 
 session_start();
 
+//log out functionality
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
 
 $mode = null;
 $gamemodeInfo = null;
@@ -12,9 +19,6 @@ $userStats = null;
 if ($_SESSION["username"] == NULL) {
     // echo "Session not established yet";
 } else {
-    // echo $_SESSION["username"];
-    // echo " ";
-    // echo $_SESSION["email"];
     $user_loggedIn = true;
 
     if (isset($_SESSION['user_id'])) {
@@ -162,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="index.php?action=logout">Logout</a></li>
+                            <li><a class="dropdown-item" href="create_game.php?action=logout">Logout</a></li>
                         </ul>
                     </div>
                 </div>
@@ -173,9 +177,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="nav flex-row">
         <ul class="vertical-nav">
             <a class="nav-link" href="index.php">Home</a>
+            <a class="nav-link active" href="create_game.php">Play</a>
             <a class="nav-link" href="leaderboard.php">Leaderboard</a>
-            <!-- For tabs the user doesn't have access to, while logged out, do we want to hide 
-            or disable them? -->
             <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>
         <div class="m-5" style="width:68%;">

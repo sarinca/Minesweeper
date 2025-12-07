@@ -267,6 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="nav flex-row">
         <ul class="vertical-nav">
             <a class="nav-link" href="index.php">Home</a>
+            <a class="nav-link" href="create_game.php">Play</a>
             <a class="nav-link active" href="leaderboard.php">Leaderboard</a>
             <a class="nav-link" href="shop.php" tabindex="-1">Shop</a>
         </ul>

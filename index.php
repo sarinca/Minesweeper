@@ -170,16 +170,14 @@ restore_error_handler();
             <a class="nav-link active" href="index.php">Home</a>
             <?php if ($user_loggedIn == false) {
                 echo "<a class='nav-link' href='login.php'>Login</a>";
-            } ?>
-            <?php if ($user_loggedIn == false) {
                 echo "<a class='nav-link' href='register.php'>Register</a>";
             } ?>
             <?php if ($user_loggedIn == true) {
+                echo "<a class='nav-link' href='create_game.php'>Play</a>";
                 echo "<a class='nav-link' href='leaderboard.php'>Leaderboard</a>";
-            } ?>
-            <?php if ($user_loggedIn == true) {
                 echo "<a class='nav-link' href='shop.php' tabindex='-1'>Shop</a>";
             } ?>
+  
         </ul>
         <div class="m-5" style="width:68%;">
             <h2 class="mb-4" id="howToPlay"> How to Play!</h2>
@@ -189,7 +187,6 @@ restore_error_handler();
             <?php
             if ($user_loggedIn == true) {
                 //display a button that says play game
-                //NOTE: we need to change this link so that we can link it to the game page
                 echo '<div style = "display:flex; justify-content: center;">
                 <a class="btn loginbtn rounded-pill mt-3" id="makeGameBtn" href="create_game.php">Start a game!</a>
                 </div>';

@@ -197,7 +197,7 @@ restore_error_handler();
                             <a class="nav-link" href="index.php">Home</a>
                             <?php if ($user_loggedIn == false) {echo "<a class='nav-link active' href='login.php'>Login</a>";}?>
                             <?php if ($user_loggedIn == false) {echo "<a class='nav-link' href='register.php'>Register</a>";}?>
-                            <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='?command=play'>Play</a>";}?>
+                            <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='create_game.php'>Play</a>";}?>
                             <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='leaderboard.php'>Leaderboard</a>";}?>
                             <?php if ($user_loggedIn == true) {echo "<a class='nav-link' href='shop.php'>Shop</a>";}?>
                         </ul>
