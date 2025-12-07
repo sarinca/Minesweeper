@@ -35,6 +35,7 @@ $gamemodeInfo = getGamemodeInfo($mode);
 $height = $gamemodeInfo['height'];
 $width = $gamemodeInfo['width'];
 // echo "game.php loaded";
+$userInventory = getUserInventory($user_id);
 ?>
 
 <!DOCTYPE html>
@@ -213,6 +214,19 @@ $width = $gamemodeInfo['width'];
             font-size: 14px;
         }
 
+        .inventory-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: #ffc562;
+        }
+
+        .inventory-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+
         #timer,
         #mine-counter {
             display: inline-block;
@@ -299,7 +313,20 @@ $width = $gamemodeInfo['width'];
 
             <div id="inventory-items">
                 <h2> <strong>Items</strong> </h2>
-                You currently have no items to use.
+                <?php if (empty($userInventory)): ?>
+                    <p class="text-center text-muted">You currently have no items to use.</p>
+                <?php else: ?>
+                    <div class="inventory-grid">
+                        <?php foreach ($userInventory as $item): ?>
+                            <div class="inventory-item">
+                                <img src="<?php echo htmlspecialchars($item['image_path']); ?>"
+                                    alt="<?php echo htmlspecialchars($item['name']); ?>" class="inventory-image">
+                                <h6 class="inventory-name"><?php echo htmlspecialchars($item['name']); ?></h6>
+                                <p class="inventory-quantity">Quantity: <?php echo $item['quantity']; ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             </div>
             <div id="game-area">
                 <div id="board"></div>
