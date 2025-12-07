@@ -530,6 +530,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["restartBtn"])) {
                                 // alert("Timer started!");
                             }
 
+                            if (state_status === "WIN" || state_status === "LOSE") {
+                                return; // Ignore clicks if game is over
+                            }
+
                             if (cell.classList.contains("clicked")) {
                                 return; // Ignore right-clicks on already clicked cells
                             }
