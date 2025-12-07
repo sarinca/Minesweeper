@@ -23,6 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'addLeaderboar
     addLeaderboardEntry($_POST['gameId']);
     exit();
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'useItem') {
+    // echo "using item...";
+    useItem($_POST['itemName'], $_POST['userId']);
+    // echo "using item...";
+    exit();
+}
 
 // -------------------- REGISTER FUNCTIONS -------------------- //
 function check_registration($email, $username) {
@@ -747,6 +753,39 @@ function addLeaderboardEntry($gameId){
         $statement2->bindValue(':userId', $userId);
         $statement2->execute();
         $statement2->closeCursor();
+
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage(); // make more generic to not leak sensitive data
+    }
+    catch (Exception $e){
+        echo $e->getMessage(); //make more generic to not leak sensitive data
+    }
+}
+
+function useItem($itemName, $userId){
+    global $db;
+    // echo "inside using item...";
+
+    try {
+        // For simplicity, assume each item has a fixed effect
+        // In a real application, you would fetch item details from the database
+        $query1 = "SELECT itemId FROM itemInventory WHERE name = :itemName";
+        $statement1 = $db->prepare($query1);
+        $statement1->bindValue(':itemName', $itemName);
+        $statement1->execute();
+        $itemData = $statement1->fetch();
+        $statement1->closeCursor();
+
+        $itemId = $itemData['itemId'];
+
+        // Remove one instance of the item from the user's inventory
+        $query = "DELETE FROM buys WHERE itemId = :itemId AND userId = :userId LIMIT 1";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':itemId', $itemId);
+        $statement->bindValue(':userId', $userId);
+        $statement->execute();
+        $statement->closeCursor();
 
     }
     catch (PDOException $e) {

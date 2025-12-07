@@ -61,9 +61,9 @@ $userInventory = getUserInventory($user_id);
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
 
-        body {
+        /* body {
             overflow: hidden;
-        }
+        } */
 
         .vertical-nav {
             position: fixed;
@@ -318,7 +318,9 @@ $userInventory = getUserInventory($user_id);
                 <?php else: ?>
                     <div class="inventory-grid">
                         <?php foreach ($userInventory as $item): ?>
-                            <div class="inventory-item">
+                            <div class="inventory-item"
+                                data-item-name="<?php echo htmlspecialchars($item['name']); ?>"
+                                data-quantity="<?php echo $item['quantity']; ?>">
                                 <img src="<?php echo htmlspecialchars($item['image_path']); ?>"
                                     alt="<?php echo htmlspecialchars($item['name']); ?>" class="inventory-image">
                                 <h6 class="inventory-name"><?php echo htmlspecialchars($item['name']); ?></h6>
@@ -328,6 +330,18 @@ $userInventory = getUserInventory($user_id);
                     </div>
                 <?php endif; ?>
             </div>
+            <script>
+                document.querySelectorAll('.inventory-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        // alert("Item clicked!");
+                        const itemName = item.getAttribute('data-item-name');
+                        // alert(`You clicked on item: ${itemName}`);
+                        useItem(itemName);
+                        updateInventoryDisplay(itemName);
+                        // Here you can add more functionality, like using the item in the game
+                    });
+                });
+            </script>
             <div id="game-area">
                 <div id="board"></div>
 
@@ -335,6 +349,7 @@ $userInventory = getUserInventory($user_id);
                     const gameId = <?php echo $gameId; ?>;
                     const height = <?php echo $height; ?>;
                     const width = <?php echo $width; ?>;
+                    const userId = <?php echo $user_id; ?>;
                     let state_status = "<?php echo $stateInfo['state_status']; ?>";
                     // alert("Game status1: " + state_status);
 
@@ -525,6 +540,56 @@ $userInventory = getUserInventory($user_id);
                                     alert('Error adding leaderboard entry: ' + error);
                                 });
                         }
+                    }
+
+                    function useItem(itemName) {
+                        // alert("Using item: " + itemName);
+                        // alert("User ID: " + userId);
+
+                        fetch('request-db.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `action=${encodeURIComponent('useItem')}` +
+                                `&itemName=${encodeURIComponent(itemName)}` +
+                                `&userId=${encodeURIComponent(userId)}`
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+                                // alert('Item used: ' + data);
+                            })
+                            .catch((error) => {
+                                alert('Error using item: ' + error);
+                            });
+
+                        // alert("Item updated in DB: " + itemName);
+
+                        
+
+                        if (itemName === "Freeze") {
+                            displayPaused = true;
+                            setTimeout(() => {
+                                displayPaused = false;
+                            }, 5000); // 5 seconds
+                        }
+                    }
+
+                    function updateInventoryDisplay(itemName) {
+                        const items = document.querySelectorAll('.inventory-item');
+                        items.forEach(item => {
+                            const name = item.getAttribute('data-item-name');
+                            if (name === itemName) {
+                                let quantity = parseInt(item.getAttribute('data-quantity'));
+                                quantity = Math.max(0, quantity - 1); // Decrease quantity but not below 0
+                                item.setAttribute('data-quantity', quantity);
+                                const quantityElem = item.querySelector('.inventory-quantity');
+                                quantityElem.textContent = `Quantity: ${quantity}`;
+                                if (quantity === 0) {
+                                    item.remove(); // Remove item from display if quantity is 0
+                                }
+                            }
+                        });
                     }
 
                     function checkWin() {
