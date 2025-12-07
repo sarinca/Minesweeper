@@ -54,9 +54,9 @@ restore_error_handler();
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
 
-        body {
+        /* body {
             overflow: hidden;
-        }
+        } */
         .btn-primary {
             --bs-btn-bg: #7ba1f5;
             --bs-btn-border-color: #82a1e5;
