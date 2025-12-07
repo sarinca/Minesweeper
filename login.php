@@ -104,6 +104,10 @@ restore_error_handler();
         <!-- ../styles.css -->
         <link rel="stylesheet" href="styles.css">
         <style>
+            body {
+                overflow: hidden;
+            }
+
             tr.table-warning {
                 --bs-table-bg: #FFE9B1 !important;
                 /* Light Yellow */

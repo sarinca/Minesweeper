@@ -455,6 +455,11 @@ $width = $gamemodeInfo['width'];
                             .then(response => response.text())
                             .then(data => {
                                 // alert('Success: ' + data);
+                                if(state_status === "WIN") {
+                                    alert('You win!')
+                                } else if (state_status === "LOSE") {
+                                    alert('Boo! You lose!')
+                                }
                             })
                             .catch((error) => {
                                 alert('Error: ' + error);
@@ -467,8 +472,7 @@ $width = $gamemodeInfo['width'];
                                     'Content-Type': 'application/x-www-form-urlencoded',
                                 },
                                 body: `action=${encodeURIComponent('updatePoints')}` +
-                                    `&gameId=${encodeURIComponent(gameId)}` +
-                                    `&mode=${encodeURIComponent(mode)}`
+                                    `&gameId=${encodeURIComponent(gameId)}` 
                             })
                                 .then(response => response.text())
                                 .then(data => {
